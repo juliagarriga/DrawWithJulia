@@ -2,32 +2,45 @@ package proves.julia.drawwithjulia;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.view.Display;
+import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 public class MainActivity extends Activity {
 
     private LinearLayout okButton, cancelButton, cameraButton, editButton;
     private ImageView image;
-    private static final int SIGNATURE_REQUEST = 1;
+    private static final int MEDIA_TYPE_IMAGE = 1;
     private Matrix originalMatrix;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private Uri uri;
+    private OutputMediaFile outputMediaFile;
+    private Bitmap bitmap;
+    private String filepath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        outputMediaFile = new OutputMediaFile(this);
 
         setLayouts();
     }
@@ -60,6 +73,7 @@ public class MainActivity extends Activity {
             public void onClick(View view)  {
 
                 Intent intent = new Intent(MainActivity.this, EditImageActivity.class);
+                intent.putExtra("path", filepath);
                 startActivity(intent);
 
             }
@@ -78,6 +92,11 @@ public class MainActivity extends Activity {
 
         // create Intent to take a picture and return control to the calling application
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        uri = outputMediaFile.getOutputMediaFileUri("prova");
+
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
         }
@@ -86,9 +105,33 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            image.setImageBitmap(imageBitmap);
+
+            try {
+
+
+                Bitmap captureBmp = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                File file = new File(uri.getPath());
+                filepath = file.getAbsolutePath();
+                OutputStream outStream = new FileOutputStream(file);
+
+                Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+
+                Matrix matrix = new Matrix();
+                //If the image is not horizontal, if the width is bigger that the height means it is rotated 90º
+                if(captureBmp.getWidth()>captureBmp.getHeight() && display.getRotation()!=Surface.ROTATION_90
+                        && display.getRotation()!=Surface.ROTATION_270)
+                    matrix.postRotate(90);
+                bitmap = Bitmap.createBitmap(captureBmp, 0, 0, captureBmp.getWidth(), captureBmp.getHeight(), matrix, true);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 60, outStream);
+                outStream.flush();
+                outStream.close();
+
+                image.setImageBitmap(bitmap);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
         }
     }
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Signature</string>
+    <string name="app_name">Draw With Julia</string>
 
     <string name="accept_sign_dialog">Vol guardar la signatura?</string>
     <string name="cancel_sign_dialog">Està segur que vol cancel·lar la signatura?</string>

@@ -2,6 +2,7 @@ package proves.julia.drawwithjulia;
 
 import android.app.Activity;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 
 import java.io.File;
@@ -20,17 +21,16 @@ public class OutputMediaFile {
 
     /** Create a file Uri for saving an image or video */
     public Uri getOutputMediaFileUri(String filename) {
-        return Uri.fromFile(getOutputMediaFile(filename));
+            return Uri.fromFile(getOutputMediaFile(filename));
     }
 
     /** Create a File for saving an image or video */
-    private File getOutputMediaFile(String filename) {
+    public File getOutputMediaFile(String filename) {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
 
 
-        File mediaStorageDir;
-        mediaStorageDir = new File(Utilitats.getWorkFolder(activity, Utilitats.IMAGES), "");
+        File mediaStorageDir = new File(Utilitats.getWorkFolder(activity, Utilitats.IMAGES), "");
 
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
@@ -38,7 +38,7 @@ public class OutputMediaFile {
         // Create the storage directory if it does not exist
         if (! mediaStorageDir.exists()){
             if (! mediaStorageDir.mkdirs()){
-                Log.d("Gestvia", "failed to create directory");
+                Log.d("OMF", "failed to create directory");
                 return null;
             }
         }
