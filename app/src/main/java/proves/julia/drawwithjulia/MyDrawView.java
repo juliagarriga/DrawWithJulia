@@ -12,6 +12,8 @@ import android.view.MotionEvent;
 
 import com.github.chrisbanes.photoview.PhotoView;
 
+import java.util.ArrayList;
+
 public class MyDrawView extends PhotoView {
     public Bitmap  mBitmap;
     public Canvas  mCanvas;
@@ -20,6 +22,8 @@ public class MyDrawView extends PhotoView {
     private Paint   mPaint;
     private boolean touchable;
     private boolean isTouched;
+    private ArrayList<Path> paths = new ArrayList<Path>();
+    private ArrayList<Path> undonePaths = new ArrayList<Path>();
 
 
     public MyDrawView(Context c, AttributeSet attrs) {
@@ -63,33 +67,33 @@ public class MyDrawView extends PhotoView {
     }
 
 
-    /*@Override
+    @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        if (w <= 0 || h <= 0)
+        /*if (w <= 0 || h <= 0)
             mBitmap = Bitmap.createBitmap(250, 250, Bitmap.Config.ARGB_8888);
         else
             mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        mCanvas = new Canvas(mBitmap);
-    }*/
+        mCanvas = new Canvas(mBitmap);*/
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
 
         super.onDraw(canvas);
 
+        mCanvas = new Canvas(mBitmap);
         if (touchable) {
 
-            Matrix m = getMatrix();
-
-            m.setTranslate(0, -(mBitmap.getHeight() - this.getHeight()));
-
-            canvas.drawBitmap(mBitmap, m, mBitmapPaint);
+            for (Path p : paths){
+                canvas.drawPath(p, mPaint);
+                mCanvas.drawPath(p, mPaint);
+            }
 
             canvas.drawPath(mPath, mPaint);
 
-            setImageBitmap(mBitmap);
+            canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         }
     }
 
@@ -97,6 +101,7 @@ public class MyDrawView extends PhotoView {
     private static final float TOUCH_TOLERANCE = 4;
 
     private void touch_start(float x, float y) {
+        undonePaths.clear();
         mPath.reset();
         mPath.moveTo(x, y);
         mX = x;
@@ -113,13 +118,29 @@ public class MyDrawView extends PhotoView {
     }
     private void touch_up() {
         mPath.lineTo(mX, mY);
-        // Set canvas to the bottom of the bitmap
-        mCanvas.translate(0, mBitmap.getHeight() - this.getHeight());
         // commit the path to our offscreen
-        mCanvas.drawPath(mPath, mPaint);
-        mCanvas.translate(0, - mBitmap.getHeight() + this.getHeight());
+        //mCanvas.drawPath(mPath, mPaint);
+        // save to the list of drawn paths
+        paths.add(mPath);
         // kill this so we don't double draw
         mPath.reset();
+    }
+
+    public void onClickUndo () {
+        if (paths.size()>0) {
+            undonePaths.add(paths.remove(paths.size()-1));
+            invalidate();
+        }
+        //toast the user
+    }
+
+    public void onClickRedo (){
+
+        if (undonePaths.size()>0) {
+            paths.add(undonePaths.remove(undonePaths.size()-1));
+            invalidate();
+        }
+        //toast the user
     }
 
     public void setTouchable(boolean touchable) {
@@ -175,6 +196,7 @@ public class MyDrawView extends PhotoView {
 
 
     public void clear(){
+
         mBitmap.eraseColor(Color.GREEN);
         invalidate();
         System.gc();

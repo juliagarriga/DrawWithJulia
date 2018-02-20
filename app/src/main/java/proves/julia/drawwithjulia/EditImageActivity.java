@@ -12,7 +12,9 @@ import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Surface;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,7 +28,8 @@ import java.io.OutputStream;
 
 public class EditImageActivity extends Activity {
 
-    private MyDrawView myDrawView;
+    private CanvasView myDrawView;
+    private LinearLayout pencilButton, undoButton, redoButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,7 +38,7 @@ public class EditImageActivity extends Activity {
 
         Bitmap bitmap;
 
-        myDrawView = findViewById(R.id.image);
+        setLayouts();
 
         try {
 
@@ -54,7 +57,7 @@ public class EditImageActivity extends Activity {
 
             bitmap = BitmapFactory.decodeFile(filepath, options);
 
-            myDrawView.setImageBitmap(bitmap);
+            myDrawView.setBitmap(bitmap);
 
         } catch (NullPointerException e) {
 
@@ -62,6 +65,45 @@ public class EditImageActivity extends Activity {
             e.printStackTrace();
         }
 
+    }
+
+    private void setLayouts() {
+
+        myDrawView = findViewById(R.id.image);
+
+        pencilButton = findViewById(R.id.pencilButton);
+        undoButton = findViewById(R.id.undoButton);
+        redoButton = findViewById(R.id.redoButton);
+
+        pencilButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toSign();
+            }
+        });
+
+        undoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                myDrawView.onClickUndo();
+            }
+        });
+
+        redoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                myDrawView.onClickRedo();
+            }
+        });
+    }
+
+    private void toSign() {
+
+        myDrawView.setDrawingCacheEnabled(false);
+
+        //myDrawView.setZoomable(false);
+
+        //myDrawView.setTouchable(true);
 
     }
 }
