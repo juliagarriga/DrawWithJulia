@@ -48,6 +48,8 @@ public class EditImageActivity extends AppCompatActivity {
 
         setLayouts();
 
+        setListeners();
+
         try {
 
             final String filepath = getIntent().getStringExtra("path");
@@ -254,5 +256,47 @@ public class EditImageActivity extends AppCompatActivity {
         });
         drawAttribsDialog.show(getSupportFragmentManager(), "drawAttribs");
 
+    }
+
+    private void setListeners() {
+        myDrawView.setOnDrawViewListener(new DrawView.OnDrawViewListener() {
+            @Override
+            public void onStartDrawing() {
+                //canUndoRedo();
+            }
+
+            @Override
+            public void onEndDrawing() {
+
+            }
+
+            @Override
+            public void onClearDrawing() {
+
+            }
+
+            @Override
+            public void onRequestText() {
+                RequestTextDialog requestTextDialog =
+                        RequestTextDialog.newInstance("");
+                requestTextDialog.setOnRequestTextListener(new RequestTextDialog.OnRequestTextListener() {
+                    @Override
+                    public void onRequestTextConfirmed(String requestedText) {
+                        myDrawView.refreshLastText(requestedText);
+                    }
+
+                    @Override
+                    public void onRequestTextCancelled() {
+                        myDrawView.cancelTextRequest();
+                    }
+                });
+                requestTextDialog.show(getSupportFragmentManager(), "requestText");
+            }
+
+            @Override
+            public void onAllMovesPainted() {
+
+            }
+        });
     }
 }
