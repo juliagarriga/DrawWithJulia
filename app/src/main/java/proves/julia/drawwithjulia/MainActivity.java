@@ -1,15 +1,12 @@
 package proves.julia.drawwithjulia;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.Display;
 import android.view.Surface;
@@ -19,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
@@ -47,12 +43,12 @@ public class MainActivity extends Activity {
 
     private void setLayouts() {
 
-        image = findViewById(R.id.image);
+        image = (ImageView) findViewById(R.id.image);
 
-        okButton = findViewById(R.id.okButton);
-        editButton = findViewById(R.id.editButton);
-        cancelButton = findViewById(R.id.cancelButton);
-        cameraButton = findViewById(R.id.cameraButton);
+        okButton = (LinearLayout) findViewById(R.id.okButton);
+        editButton = (LinearLayout) findViewById(R.id.editButton);
+        cancelButton = (LinearLayout) findViewById(R.id.cancelButton);
+        cameraButton = (LinearLayout) findViewById(R.id.cameraButton);
 
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override

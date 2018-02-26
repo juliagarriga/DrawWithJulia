@@ -2,7 +2,6 @@ package proves.julia.drawwithjulia;
 
 import android.app.Activity;
 import android.net.Uri;
-import android.os.Build;
 import android.util.Log;
 
 import java.io.File;

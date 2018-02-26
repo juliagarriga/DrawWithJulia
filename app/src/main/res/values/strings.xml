@@ -3,4 +3,20 @@
 
     <string name="accept_sign_dialog">Vol guardar la signatura?</string>
     <string name="cancel_sign_dialog">Està segur que vol cancel·lar la signatura?</string>
+
+    <!-- Edit buttons -->
+    <string name="undo">Undo</string>
+    <string name="redo">Redo</string>
+    <string name="pen">Pen</string>
+    <string name="rubber">Rubber</string>
+    <string name="text">Text</string>
+    <string name="figures">Figures</string>
+
+    <!-- Figures buttons -->
+    <string name="line">Line</string>
+    <string name="arrow">Arrow</string>
+    <string name="rectangle">Rect</string>
+    <string name="circle">Circle</string>
+    <string name="ellipse">Ellipse</string>
+
 </resources>
