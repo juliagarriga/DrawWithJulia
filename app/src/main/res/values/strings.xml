@@ -5,10 +5,12 @@
     <string name="cancel_sign_dialog">Està segur que vol cancel·lar la signatura?</string>
 
     <!-- Edit buttons -->
+    <string name="save">Save</string>
     <string name="undo">Undo</string>
     <string name="redo">Redo</string>
     <string name="pen">Pen</string>
     <string name="rubber">Rubber</string>
+    <string name="drawAttr">Draw Attr</string>
     <string name="text">Text</string>
     <string name="figures">Figures</string>
 
@@ -18,5 +20,11 @@
     <string name="rectangle">Rect</string>
     <string name="circle">Circle</string>
     <string name="ellipse">Ellipse</string>
+
+    <!-- Draw Attributes -->
+
+    <string name="stroke_width">Stroke width: %d</string>
+    <string name="opacity">Opacity: %d</string>
+    <string name="font_size">Font size: %d</string>
 
 </resources>
