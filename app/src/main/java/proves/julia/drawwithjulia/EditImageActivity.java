@@ -17,14 +17,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.byox.drawview.enums.BackgroundScale;
-import com.byox.drawview.enums.BackgroundType;
 import com.byox.drawview.enums.DrawingMode;
 import com.byox.drawview.enums.DrawingTool;
 import com.byox.drawview.views.DrawView;
-
-import java.io.File;
-import java.io.FileOutputStream;
 
 /**
  * Created by julia on 2/14/18.
