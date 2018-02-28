@@ -1466,6 +1466,20 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                                 break;
 
                             case ELLIPSE:
+
+                                startX = drawMove.getEndX() - Math.abs(drawMove.getEndX() - drawMove.getStartX());
+                                startY = drawMove.getEndY() - Math.abs(drawMove.getEndY() - drawMove.getStartY());
+                                endX = drawMove.getEndX() + Math.abs(drawMove.getEndX() - drawMove.getStartX());
+                                endY = drawMove.getEndY() + Math.abs(drawMove.getEndY() - drawMove.getStartY());
+
+                                if (checkInRectangle(x, y, startX, startY, endX, endY)) {
+
+                                    touchedMove = true;
+
+                                    addMove(drawMove, vx, vy);
+
+                                    move.setMove(mDrawMoveHistory.get(i));
+                                }
                                 break;
                         }
 
