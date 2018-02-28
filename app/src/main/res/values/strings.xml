@@ -9,12 +9,14 @@
     <string name="undo">Undo</string>
     <string name="redo">Redo</string>
     <string name="pen">Pen</string>
+    <string name="move">Move</string>
     <string name="rubber">Rubber</string>
     <string name="drawAttr">Draw Attr</string>
     <string name="text">Text</string>
     <string name="figures">Figures</string>
 
     <!-- Figures buttons -->
+    <string name="curve">Curve</string>
     <string name="line">Line</string>
     <string name="arrow">Arrow</string>
     <string name="rectangle">Rect</string>

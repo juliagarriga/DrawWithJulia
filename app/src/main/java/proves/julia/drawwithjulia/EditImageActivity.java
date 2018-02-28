@@ -31,7 +31,7 @@ public class EditImageActivity extends AppCompatActivity {
     private FrameLayout parentLayout;
     private LinearLayout pencilButton, undoButton, redoButton, eraseButton, textButton,
             figuresButton, rightLayout, lineButton, arrowButton, rectangleButton,
-            circleButton, ellipseButton, drawAttrButton;
+            circleButton, ellipseButton, drawAttrButton, moveButton, curveButton;
     private ImageView figuresImage, backgroundImage;
     private TextView figuresText;
     private Bitmap bitmap;
@@ -94,11 +94,13 @@ public class EditImageActivity extends AppCompatActivity {
         rightLayout = (LinearLayout) findViewById(R.id.rightLayout);
         drawAttrButton = (LinearLayout) findViewById(R.id.drawAttrButton);
         pencilButton = (LinearLayout) findViewById(R.id.pencilButton);
+        moveButton = (LinearLayout) findViewById(R.id.moveButton);
         undoButton = (LinearLayout) findViewById(R.id.undoButton);
         redoButton = (LinearLayout) findViewById(R.id.redoButton);
         eraseButton = (LinearLayout) findViewById(R.id.eraseButton);
         textButton = (LinearLayout) findViewById(R.id.textButton);
         figuresButton = (LinearLayout) findViewById(R.id.figuresButton);
+        curveButton = (LinearLayout) findViewById(R.id.curveButton);
         lineButton = (LinearLayout) findViewById(R.id.lineButton);
         arrowButton = (LinearLayout) findViewById(R.id.arrowButton);
         rectangleButton = (LinearLayout) findViewById(R.id.rectangleButton);
@@ -124,9 +126,13 @@ public class EditImageActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 myDrawView.setDrawingMode(DrawingMode.DRAW);
-                myDrawView.setDrawingTool(DrawingTool.PEN);
-                figuresImage.setImageResource(R.drawable.group);
-                figuresText.setText(getResources().getString(R.string.figures));
+            }
+        });
+
+        moveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                myDrawView.setDrawingMode(DrawingMode.MOVE);
             }
         });
 
@@ -170,9 +176,24 @@ public class EditImageActivity extends AppCompatActivity {
             }
         });
 
+        curveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                myDrawView.setDrawingMode(DrawingMode.DRAW);
+                myDrawView.setDrawingTool(DrawingTool.PEN);
+                invertRightLayout();
+                figuresImage.setImageResource(R.drawable.group);
+                figuresText.setText(getResources().getString(R.string.figures));
+
+            }
+        });
+
         lineButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                myDrawView.setDrawingMode(DrawingMode.DRAW);
                 myDrawView.setDrawingTool(DrawingTool.LINE);
                 invertRightLayout();
                 figuresImage.setImageResource(R.drawable.line);
@@ -183,6 +204,8 @@ public class EditImageActivity extends AppCompatActivity {
         arrowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                myDrawView.setDrawingMode(DrawingMode.DRAW);
                 myDrawView.setDrawingTool(DrawingTool.ARROW);
                 invertRightLayout();
                 figuresImage.setImageResource(R.drawable.arrow);
@@ -193,6 +216,8 @@ public class EditImageActivity extends AppCompatActivity {
         rectangleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                myDrawView.setDrawingMode(DrawingMode.DRAW);
                 myDrawView.setDrawingTool(DrawingTool.RECTANGLE);
                 invertRightLayout();
                 figuresImage.setImageResource(R.drawable.rectangle);
@@ -203,6 +228,8 @@ public class EditImageActivity extends AppCompatActivity {
         circleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                myDrawView.setDrawingMode(DrawingMode.DRAW);
                 myDrawView.setDrawingTool(DrawingTool.CIRCLE);
                 invertRightLayout();
                 figuresImage.setImageResource(R.drawable.circle);
@@ -213,6 +240,8 @@ public class EditImageActivity extends AppCompatActivity {
         ellipseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                myDrawView.setDrawingMode(DrawingMode.DRAW);
                 myDrawView.setDrawingTool(DrawingTool.ELLIPSE);
                 invertRightLayout();
                 figuresImage.setImageResource(R.drawable.ellipse);

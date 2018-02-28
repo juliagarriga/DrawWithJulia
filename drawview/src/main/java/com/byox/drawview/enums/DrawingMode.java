@@ -7,5 +7,6 @@ package com.byox.drawview.enums;
 public enum DrawingMode {
     DRAW,
     TEXT,
-    ERASER
+    ERASER,
+    MOVE
 }

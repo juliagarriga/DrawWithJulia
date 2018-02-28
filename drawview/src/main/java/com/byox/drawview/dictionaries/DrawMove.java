@@ -14,6 +14,7 @@ import com.byox.drawview.utils.SerializablePath;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,25 +28,24 @@ import java.util.List;
 
 public class DrawMove implements Serializable {
 
-    private static DrawMove mSingleton;
-
     private SerializablePaint mPaint;
     private DrawingMode mDrawingMode = null;
     private DrawingTool mDrawingTool = null;
-    //private List<SerializablePath> mDrawingPathList;
-    private SerializablePath mDrawingPath;
-    private float mStartX, mStartY, mEndX, mEndY;
+    private List<Move> mDrawingMovesList;
+    private int mDrawingMovesListIndex = -1;
     private String mText;
     private Matrix mBackgroundMatrix;
     private byte[] mBackgroundImage;
+    private List<DrawMove> movedMoves;     // only for DrawingMode MOVE
 
     // METHODS
-    private DrawMove() {
-    }
+    public DrawMove() {
 
-    public static DrawMove newInstance() {
-        mSingleton = new DrawMove();
-        return mSingleton;
+        mDrawingMovesList = new ArrayList<>();
+        movedMoves = new ArrayList<>();
+
+        addMove();
+
     }
 
     // GETTERS
@@ -63,23 +63,23 @@ public class DrawMove implements Serializable {
     }
 
     public SerializablePath getDrawingPath() {
-        return mDrawingPath;
+        return mDrawingMovesList.get(mDrawingMovesListIndex).getPath();
     }
 
     public float getStartX() {
-        return mStartX;
+        return mDrawingMovesList.get(mDrawingMovesListIndex).getStartX();
     }
 
     public float getStartY() {
-        return mStartY;
+        return mDrawingMovesList.get(mDrawingMovesListIndex).getStartY();
     }
 
     public float getEndX() {
-        return mEndX;
+        return mDrawingMovesList.get(mDrawingMovesListIndex).getEndX();
     }
 
     public float getEndY() {
-        return mEndY;
+        return mDrawingMovesList.get(mDrawingMovesListIndex).getEndY();
     }
 
     public String getText() {
@@ -96,74 +96,85 @@ public class DrawMove implements Serializable {
 
     // SETTERS
 
-    public DrawMove setPaint(SerializablePaint paint) {
-        if (mSingleton != null) {
-            mSingleton.mPaint = paint;
-            return mSingleton;
-        } else throw new RuntimeException("Create new instance of DrawMove first!");
+    public void setPaint(SerializablePaint paint) {
+        mPaint = paint;
     }
 
-    public DrawMove setDrawingMode(DrawingMode drawingMode) {
-        if (mSingleton != null) {
-            mSingleton.mDrawingMode = drawingMode;
-            return mSingleton;
-        } else throw new RuntimeException("Create new instance of DrawMove first!");
+    public void setDrawingMode(DrawingMode drawingMode) {
+        mDrawingMode = drawingMode;
     }
 
-    public DrawMove setDrawingTool(DrawingTool drawingTool) {
-        if (mSingleton != null) {
-            mSingleton.mDrawingTool = drawingTool;
-            return mSingleton;
-        } else throw new RuntimeException("Create new instance of DrawMove first!");
+    public void setDrawingTool(DrawingTool drawingTool) {
+        mDrawingTool = drawingTool;
     }
 
-    public DrawMove setDrawingPathList(SerializablePath drawingPath) {
-        if (mSingleton != null) {
-            mSingleton.mDrawingPath = drawingPath;
-            return mSingleton;
-        } else throw new RuntimeException("Create new instance of DrawMove first!");
+    public void setDrawingPathList(SerializablePath drawingPath) {
+        mDrawingMovesList.get(mDrawingMovesListIndex).setPath(drawingPath);
     }
 
-    public DrawMove setStartX(float startX) {
-        if (mSingleton != null) {
-            mSingleton.mStartX = startX;
-            return mSingleton;
-        } else throw new RuntimeException("Create new instance of DrawMove first!");
+    public void setStartX(float startX) {
+        mDrawingMovesList.get(mDrawingMovesListIndex).setStartX(startX);
     }
 
-    public DrawMove setStartY(float startY) {
-        if (mSingleton != null) {
-            mSingleton.mStartY = startY;
-            return mSingleton;
-        } else throw new RuntimeException("Create new instance of DrawMove first!");
+    public void setStartY(float startY) {
+        mDrawingMovesList.get(mDrawingMovesListIndex).setStartY(startY);
     }
 
-    public DrawMove setEndX(float endX) {
-        if (mSingleton != null) {
-            mSingleton.mEndX = endX;
-            return mSingleton;
-        } else throw new RuntimeException("Create new instance of DrawMove first!");
+    public void setEndX(float endX) {
+        mDrawingMovesList.get(mDrawingMovesListIndex).setEndX(endX);
     }
 
-    public DrawMove setEndY(float endY) {
-        if (mSingleton != null) {
-            mSingleton.mEndY = endY;
-            return mSingleton;
-        } else throw new RuntimeException("Create new instance of DrawMove first!");
+    public void setEndY(float endY) {
+        mDrawingMovesList.get(mDrawingMovesListIndex).setEndY(endY);
     }
 
-    public DrawMove setText(String text) {
-        if (mSingleton != null) {
-            mSingleton.mText = text;
-            return mSingleton;
-        } else throw new RuntimeException("Create new instance of DrawMove first!");
+    public void setText(String text) {
+        mText = text;
     }
 
-    public DrawMove setBackgroundImage(byte[] backgroundImage, Matrix backgroundMatrix) {
-        if (mSingleton != null) {
-            mSingleton.mBackgroundImage = backgroundImage;
-            mSingleton.mBackgroundMatrix = backgroundMatrix;
-            return mSingleton;
-        } else throw new RuntimeException("Create new instance of DrawMove first!");
+    public void setBackgroundImage(byte[] backgroundImage, Matrix backgroundMatrix) {
+        mBackgroundImage = backgroundImage;
+        mBackgroundMatrix = backgroundMatrix;
+    }
+
+    public void addPoint(float x, float y) {
+        mDrawingMovesList.get(mDrawingMovesListIndex).addPoint(x, y);
+    }
+
+    public void addMove() {
+
+        if (mDrawingMovesListIndex >= -1 &&
+                mDrawingMovesListIndex < mDrawingMovesList.size() - 1)
+            mDrawingMovesList = mDrawingMovesList.subList(0, mDrawingMovesListIndex + 1);
+
+        Move move = new Move();
+
+        mDrawingMovesList.add(move);
+
+        mDrawingMovesListIndex++;
+    }
+
+    public List<Float> getmPointsX() {
+        return mDrawingMovesList.get(mDrawingMovesListIndex).getPointsX();
+    }
+
+    public List<Float> getmPointsY() {
+        return mDrawingMovesList.get(mDrawingMovesListIndex).getPointsY();
+    }
+
+    public void setMove(DrawMove move) {
+        movedMoves.add(move);
+    }
+
+    public List<DrawMove> getMovedMoves() {
+        return movedMoves;
+    }
+
+    public void undo() {
+        mDrawingMovesListIndex--;
+    }
+
+    public void redo() {
+        mDrawingMovesListIndex++;
     }
 }

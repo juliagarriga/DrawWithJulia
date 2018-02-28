@@ -15,6 +15,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Region;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -128,6 +129,9 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
     private CardView mZoomRegionCardView;
     private ZoomRegionView mZoomRegionView;
 
+    // Number of pixels error to check for when moving
+    private int Epsilon = 50;
+
     /**
      * Default constructor
      *
@@ -236,13 +240,9 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                                         drawMove.getEndX(), drawMove.getEndY(), drawMove.getPaint());
                                 break;
                             case CIRCLE:
-                                if (drawMove.getEndX() > drawMove.getStartX()) {
-                                    mContentCanvas.drawCircle(drawMove.getStartX(), drawMove.getStartY(),
-                                            drawMove.getEndX() - drawMove.getStartX(), drawMove.getPaint());
-                                } else {
-                                    mContentCanvas.drawCircle(drawMove.getStartX(), drawMove.getStartY(),
-                                            drawMove.getStartX() - drawMove.getEndX(), drawMove.getPaint());
-                                }
+                                mContentCanvas.drawCircle(drawMove.getStartX(), drawMove.getStartY(),
+                                        (float) computeRadius(drawMove.getStartX(), drawMove.getStartY(),
+                                                drawMove.getEndX(), drawMove.getEndY()), drawMove.getPaint());
                                 break;
                             case ELLIPSE:
                                 mAuxRect.set(drawMove.getEndX() - Math.abs(drawMove.getEndX() - drawMove.getStartX()),
@@ -264,6 +264,8 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                             mContentCanvas.drawPath(drawMove.getDrawingPath(), drawMove.getPaint());
                             drawMove.getPaint().setXfermode(null);
                         }
+                        break;
+                    case MOVE:
                         break;
                 }
             }
@@ -318,11 +320,15 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                             mDrawMoveHistoryIndex < mDrawMoveHistory.size() - 1)
                         mDrawMoveHistory = mDrawMoveHistory.subList(0, mDrawMoveHistoryIndex + 1);
 
-                    mDrawMoveHistory.add(DrawMove.newInstance()
-                            .setPaint(getNewPaintParams())
-                            .setStartX(touchX).setStartY(touchY)
-                            .setEndX(touchX).setEndY(touchY)
-                            .setDrawingMode(mDrawingMode).setDrawingTool(mDrawingTool));
+                    DrawMove move = new DrawMove();
+                    move.setPaint(getNewPaintParams());
+                    move.setStartX(touchX);
+                    move.setStartY(touchY);
+                    move.setEndX(touchX);
+                    move.setEndY(touchY);
+                    move.setDrawingMode(mDrawingMode);
+                    move.setDrawingTool(mDrawingTool);
+                    mDrawMoveHistory.add(move);
                     lastMoveIndex = mDrawMoveHistory.size() - 1;
 
 //                    Paint currentPaint = mDrawMoveHistory.get(mDrawMoveHistory.size() - 1).getPaint();
@@ -330,12 +336,12 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
 //                    mDrawMoveHistory.get(mDrawMoveHistory.size() - 1).setPaint(currentPaint);
 
                     mDrawMoveHistoryIndex++;
+                    mDrawMoveHistory.get(lastMoveIndex).addPoint(touchX, touchY);
 
                     if (mDrawingTool == DrawingTool.PEN || mDrawingMode == DrawingMode.ERASER) {
                         SerializablePath path = new SerializablePath();
                         path.moveTo(touchX, touchY);
                         path.lineTo(touchX, touchY);
-
                         mDrawMoveHistory.get(lastMoveIndex).setDrawingPathList(path);
                     }
                     break;
@@ -347,15 +353,18 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                         lastMoveIndex = mDrawMoveHistory.size() - 1;
 
                         if (mDrawMoveHistory.size() > 0) {
-                            mDrawMoveHistory.get(lastMoveIndex).setEndX(touchX).setEndY(touchY);
+                            mDrawMoveHistory.get(lastMoveIndex).setEndX(touchX);
+                            mDrawMoveHistory.get(lastMoveIndex).setEndY(touchY);
 
                             if (mDrawingTool == DrawingTool.PEN || mDrawingMode == DrawingMode.ERASER) {
                                 for (int i = 0; i < motionEvent.getHistorySize(); i++) {
                                     float historicalX = motionEvent.getHistoricalX(i) / mZoomFactor + mCanvasClipBounds.left;
                                     float historicalY = motionEvent.getHistoricalY(i) / mZoomFactor + mCanvasClipBounds.top;
                                     mDrawMoveHistory.get(lastMoveIndex).getDrawingPath().lineTo(historicalX, historicalY);
+                                    mDrawMoveHistory.get(lastMoveIndex).addPoint(historicalX, historicalY);
                                 }
                                 mDrawMoveHistory.get(lastMoveIndex).getDrawingPath().lineTo(touchX, touchY);
+                                mDrawMoveHistory.get(lastMoveIndex).addPoint(touchX, touchY);
                             }
                         }
                     }
@@ -372,21 +381,32 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                     } else if (mLastTouchEvent == MotionEvent.ACTION_MOVE) {
                         mLastTouchEvent = -1;
                         if (mDrawMoveHistory.size() > 0) {
-                            mDrawMoveHistory.get(lastMoveIndex).setEndX(touchX).setEndY(touchY);
+                            mDrawMoveHistory.get(lastMoveIndex).setEndX(touchX);
+                            mDrawMoveHistory.get(lastMoveIndex).setEndY(touchY);
 
                             if (mDrawingTool == DrawingTool.PEN || mDrawingMode == DrawingMode.ERASER) {
                                 for (int i = 0; i < motionEvent.getHistorySize(); i++) {
                                     float historicalX = motionEvent.getHistoricalX(i) / mZoomFactor + mCanvasClipBounds.left;
                                     float historicalY = motionEvent.getHistoricalY(i) / mZoomFactor + mCanvasClipBounds.top;
                                     mDrawMoveHistory.get(lastMoveIndex).getDrawingPath().lineTo(historicalX, historicalY);
+                                    mDrawMoveHistory.get(lastMoveIndex).addPoint(historicalX, historicalY);
                                 }
                                 mDrawMoveHistory.get(lastMoveIndex).getDrawingPath().lineTo(touchX, touchY);
+                                mDrawMoveHistory.get(lastMoveIndex).addPoint(touchX, touchY);
                             }
                         }
                     }
 
                     if (onDrawViewListener != null && mDrawingMode == DrawingMode.TEXT)
                         onDrawViewListener.onRequestText();
+
+                    if (mDrawingMode == DrawingMode.MOVE) {
+                        if (!moveDraw(mDrawMoveHistory.get(lastMoveIndex))) {
+                            mDrawMoveHistory.remove(lastMoveIndex);
+                            mDrawMoveHistoryIndex--;
+                            lastMoveIndex--;
+                        }
+                    }
 
                     if (onDrawViewListener != null)
                         onDrawViewListener.onEndDrawing();
@@ -736,6 +756,10 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                 }
             }
 
+            if (mDrawMoveHistory.get(mDrawMoveHistoryIndex + 1).getDrawingMode() == DrawingMode.MOVE)
+                for (DrawMove move : mDrawMoveHistory.get(mDrawMoveHistoryIndex + 1).getMovedMoves())
+                    move.undo();
+
             invalidate();
             return true;
         }
@@ -768,6 +792,10 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                     mDrawMoveBackgroundIndex = i;
                 }
             }
+
+            if (mDrawMoveHistory.get(mDrawMoveHistoryIndex).getDrawingMode() == DrawingMode.MOVE)
+                for (DrawMove move : mDrawMoveHistory.get(mDrawMoveHistoryIndex).getMovedMoves())
+                    move.redo();
 
             invalidate();
             return true;
@@ -1207,10 +1235,10 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] bitmapArray = byteArrayOutputStream.toByteArray();
         bitmap.recycle();
-
-        mDrawMoveHistory.add(DrawMove.newInstance()
-                .setBackgroundImage(bitmapArray, matrix)
-                .setPaint(new SerializablePaint()));
+        DrawMove drawMove = new DrawMove();
+        drawMove.setBackgroundImage(bitmapArray, matrix);
+        drawMove.setPaint(new SerializablePaint());
+        mDrawMoveHistory.add(drawMove);
         mDrawMoveHistoryIndex++;
 
         mDrawMoveBackgroundIndex = mDrawMoveHistoryIndex;
@@ -1257,9 +1285,10 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
         byte[] bitmapArray = byteArrayOutputStream.toByteArray();
         bitmap.recycle();
 
-        mDrawMoveHistory.add(DrawMove.newInstance()
-                .setBackgroundImage(bitmapArray, backgroundMatrix)
-                .setPaint(new SerializablePaint()));
+        DrawMove drawMove = new DrawMove();
+        drawMove.setBackgroundImage(bitmapArray, backgroundMatrix);
+        drawMove.setPaint(new SerializablePaint());
+        mDrawMoveHistory.add(drawMove);
         mDrawMoveHistoryIndex++;
 
         mDrawMoveBackgroundIndex = mDrawMoveHistoryIndex;
@@ -1316,7 +1345,217 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
         return this;
     }
 
+    /**
+     * Searches for a drawMove in our Canvas that intersects with the actual move.
+     * If there is some, it uses the actual move to move the latter.
+     *
+     * @param move drawMove used for moving DrawMove objects
+     * @return if an object has been moved
+     */
+    public boolean moveDraw(DrawMove move) {
+
+        boolean touchedMove = false;
+
+        for (int i = 0; i < mDrawMoveHistoryIndex; i++) {
+            DrawMove drawMove = mDrawMoveHistory.get(i);
+            if (mDrawMoveHistory.get(i).getDrawingMode() != null) {
+                switch (mDrawMoveHistory.get(i).getDrawingMode()) {
+                    case DRAW:
+
+                        float x = move.getStartX();
+                        float y = move.getStartY();
+
+                        float vx = move.getEndX() - x;
+                        float vy = move.getEndY() - y;
+
+                        switch (drawMove.getDrawingTool()) {
+
+                            case PEN:
+                                SerializablePath path = drawMove.getDrawingPath();
+                                if (path != null) {
+
+                                    RectF rectF = new RectF();
+                                    path.computeBounds(rectF, true);
+                                    Region region = new Region();
+                                    region.setPath(path, new Region((int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom));
+
+                                    if (region.contains((int) x, (int) y)) {
+
+                                        touchedMove = true;
+
+                                        List<Float> pointsX = new ArrayList(mDrawMoveHistory.get(i).getmPointsX());
+                                        List<Float> pointsY = new ArrayList(mDrawMoveHistory.get(i).getmPointsY());
+                                        float moveX = drawMove.getStartX() + vx;
+                                        float moveY = drawMove.getStartY() + vy;
+                                        mDrawMoveHistory.get(i).addMove();
+                                        mDrawMoveHistory.get(i).setStartX(moveX);
+                                        mDrawMoveHistory.get(i).setStartY(moveY);
+                                        SerializablePath newPath = new SerializablePath();
+                                        newPath.moveTo(moveX, moveY);
+                                        mDrawMoveHistory.get(i).setDrawingPathList(newPath);
+
+                                        for (int j = 0; j < pointsX.size(); j++) {
+                                            moveX = pointsX.get(j) + vx;
+                                            moveY = pointsY.get(j) + vy;
+                                            mDrawMoveHistory.get(i).getDrawingPath().lineTo(moveX, moveY);
+                                            mDrawMoveHistory.get(i).addPoint(moveX, moveY);
+                                        }
+
+                                        mDrawMoveHistory.get(i).setEndX(moveX);
+                                        mDrawMoveHistory.get(i).setEndY(moveY);
+
+                                        move.setMove(mDrawMoveHistory.get(i));
+                                    }
+                                }
+                                break;
+
+                            case LINE:
+
+                                Region r = lineRegion(drawMove);
+
+                                if (r.contains((int) x, (int) y)) {
+
+                                    touchedMove = true;
+
+                                    addMove(drawMove, vx, vy);
+
+                                    move.setMove(mDrawMoveHistory.get(i));
+                                }
+                                break;
+                            case ARROW:
+
+                                r = lineRegion(drawMove);
+
+                                if (r.contains((int) x, (int) y)) {
+
+                                    touchedMove = true;
+
+                                    addMove(drawMove, vx, vy);
+
+                                    move.setMove(mDrawMoveHistory.get(i));
+                                }
+                                break;
+                            case RECTANGLE:
+
+                                if (checkInRectangle(x, y, drawMove.getStartX(), drawMove.getStartY(), drawMove.getEndX(), drawMove.getEndY())) {
+
+                                    touchedMove = true;
+
+                                    addMove(drawMove, vx, vy);
+
+                                    move.setMove(mDrawMoveHistory.get(i));
+                                }
+                                break;
+                            case CIRCLE:
+
+                                float radius = (float) computeRadius(drawMove.getStartX(), drawMove.getStartY(),
+                                        drawMove.getEndX(), drawMove.getEndY());
+                                float startX = drawMove.getStartX() - radius;
+                                float startY = drawMove.getStartY() - radius;
+                                float endX = startX + 2*radius;
+                                float endY = startY + 2*radius;
+
+                                if (checkInRectangle(x, y, startX, startY, endX, endY)) {
+
+                                    touchedMove = true;
+
+                                    addMove(drawMove, vx, vy);
+
+                                    move.setMove(mDrawMoveHistory.get(i));
+                                }
+                                break;
+
+                            case ELLIPSE:
+                                break;
+                        }
+
+                        break;
+                    case TEXT:
+                        if (drawMove.getText() != null && !drawMove.getText().equals("")) {
+                            mContentCanvas.drawText(drawMove.getText(), drawMove.getEndX(), drawMove.getEndY(), drawMove.getPaint());
+                        }
+                        break;
+                    case ERASER:
+                        if (drawMove.getDrawingPath() != null) {
+                            drawMove.getPaint().setXfermode(mEraserXefferMode);
+                            mContentCanvas.drawPath(drawMove.getDrawingPath(), drawMove.getPaint());
+                            drawMove.getPaint().setXfermode(null);
+                        }
+                        break;
+                }
+            }
+
+        }
+
+        return touchedMove;
+    }
+
     // PRIVATE METHODS
+
+    private boolean checkInRectangle(float x, float y, float startX, float startY, float endX, float endY) {
+        if (Math.abs(x - startX) < Epsilon)
+            if (y >= (startY - Epsilon)  && y <= (endY + Epsilon))
+                return true;
+        if (Math.abs(x - endX) < Epsilon)
+            if (y >= (startY - Epsilon)  && y <= (endY + Epsilon))
+                return true;
+        if (Math.abs(y - startY) < Epsilon)
+            if (x >= (startX - Epsilon)  && x <= (endX + Epsilon))
+                return true;
+        if (Math.abs(y - endY) < Epsilon)
+            if (x >= (startX - Epsilon)  && x <= (endX + Epsilon))
+                return true;
+
+        return false;
+
+    }
+
+    private void addMove(DrawMove drawMove, float vx, float vy) {
+
+        float startX = drawMove.getStartX() + vx;
+        float startY = drawMove.getStartY() + vy;
+        float endX = drawMove.getEndX() + vx;
+        float endY = drawMove.getEndY() + vy;
+
+        drawMove.addMove();
+        drawMove.setStartX(startX);
+        drawMove.setStartY(startY);
+        drawMove.setEndX(endX);
+        drawMove.setEndY(endY);
+    }
+
+    private Region lineRegion(DrawMove drawMove) {
+
+        float startX, startY, endX, endY;
+
+        if (drawMove.getStartX() < drawMove.getEndX()) {
+            startX = drawMove.getStartX();
+            endX = drawMove.getEndX();
+        } else {
+            endX = drawMove.getStartX();
+            startX = drawMove.getEndX();
+        }
+
+        if (drawMove.getStartY() < drawMove.getEndY()) {
+            startY = drawMove.getStartY();
+            endY = drawMove.getEndY();
+        } else {
+            endY = drawMove.getStartY();
+            startY = drawMove.getEndY();
+        }
+
+        return new Region((int) startX, (int) startY,
+                (int) endX, (int) endY);
+
+    }
+
+    private double computeRadius(float startX, float startY, float endX, float endY) {
+
+        float x = Math.abs(startX - endX);
+        float y = Math.abs(startY - endY);
+
+        return Math.sqrt(x*x + y*y);
+    }
 
     /**
      * Draw the background image on DrawViewCanvas
