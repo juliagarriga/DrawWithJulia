@@ -608,7 +608,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                 mFontFamily = Typeface.SANS_SERIF;
             else if (typeface == 3)
                 mFontFamily = Typeface.SERIF;
-            mFontSize = typedArray.getInteger(R.styleable.DrawView_dv_draw_font_size, 12);
+            mFontSize = typedArray.getInteger(R.styleable.DrawView_dv_draw_font_size, 125);
             isForCamera = typedArray.getBoolean(R.styleable.DrawView_dv_draw_is_camera, false);
             int orientation = typedArray.getInteger(R.styleable.DrawView_dv_draw_orientation,
                     getWidth() > getHeight() ? 1 : 0);
@@ -1359,14 +1359,15 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
         for (int i = 0; i < mDrawMoveHistoryIndex; i++) {
             DrawMove drawMove = mDrawMoveHistory.get(i);
             if (mDrawMoveHistory.get(i).getDrawingMode() != null) {
+
+                float x = move.getStartX();
+                float y = move.getStartY();
+
+                float vx = move.getEndX() - x;
+                float vy = move.getEndY() - y;
+
                 switch (mDrawMoveHistory.get(i).getDrawingMode()) {
                     case DRAW:
-
-                        float x = move.getStartX();
-                        float y = move.getStartY();
-
-                        float vx = move.getEndX() - x;
-                        float vy = move.getEndY() - y;
 
                         switch (drawMove.getDrawingTool()) {
 
@@ -1485,15 +1486,23 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
 
                         break;
                     case TEXT:
-                        if (drawMove.getText() != null && !drawMove.getText().equals("")) {
-                            mContentCanvas.drawText(drawMove.getText(), drawMove.getEndX(), drawMove.getEndY(), drawMove.getPaint());
-                        }
-                        break;
-                    case ERASER:
-                        if (drawMove.getDrawingPath() != null) {
-                            drawMove.getPaint().setXfermode(mEraserXefferMode);
-                            mContentCanvas.drawPath(drawMove.getDrawingPath(), drawMove.getPaint());
-                            drawMove.getPaint().setXfermode(null);
+
+                        Rect rect = new Rect();
+
+                        drawMove.getPaint().getTextBounds(drawMove.getText(), 0, drawMove.getText().length(), rect);
+
+                        float startX = drawMove.getEndX();
+                        float startY = drawMove.getEndY();
+                        float endX = startX + rect.width();
+                        float endY = startY + rect.height();
+
+                        if (checkInRectangle(x, y, startX, startY, endX, endY)) {
+
+                            touchedMove = true;
+
+                            addMove(drawMove, vx, vy);
+
+                            move.setMove(mDrawMoveHistory.get(i));
                         }
                         break;
                 }
