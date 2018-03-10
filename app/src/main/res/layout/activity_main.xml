@@ -18,129 +18,301 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:orientation="horizontal"
-            android:layout_gravity="bottom"
-            android:gravity="center"
-            android:id="@+id/bottomLayout"
-            android:background="@drawable/black_line_top">
-
+            android:layout_height="match_parent"
+            android:gravity="bottom">
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="0.5"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:id="@+id/editLayout"
                 android:orientation="vertical"
-                android:id="@+id/cancelButton">
+                android:padding="10dp"
+                android:background="@drawable/black_line_top">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:id="@+id/configLayout">
 
-                <ImageView
-                    android:textColor="#FFFFFF"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center"
-                    android:textSize="20sp"
-                    android:background="@drawable/cancel"/>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="0.5"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:id="@+id/contrastButton">
 
-                <TextView
-                    android:textColor="@color/black"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:text="Cancel"/>
+                        <ImageView
+                            android:textColor="#FFFFFF"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:textSize="20sp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/contrast"/>
+
+                        <TextView
+                            android:textColor="@color/black"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:text="Contrast"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="0.5"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:id="@+id/brightnessButton">
+
+                        <ImageView
+                            android:textColor="#FFFFFF"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:textSize="20sp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/brightness"/>
+
+                        <TextView
+                            android:textColor="@color/black"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:text="Brightness"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="0.5"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:id="@+id/adjustButton">
+
+                        <ImageView
+                            android:textColor="#FFFFFF"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:textSize="20sp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/adjust"/>
+
+                        <TextView
+                            android:textColor="@color/black"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:text="Adjust"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <android.support.v7.widget.AppCompatSeekBar
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    android:id="@+id/seekBar"/>
+
 
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="0.5"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:id="@+id/cameraButton">
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:orientation="horizontal"
+                android:layout_below="@id/editLayout"
+                android:gravity="bottom"
+                android:id="@+id/bottomLayout"
+                android:background="@drawable/black_line_top">
 
-                <ImageView
-                    android:textColor="#FFFFFF"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:textSize="20sp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/camera"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/buttonsLayout">
 
-                <TextView
-                    android:textColor="@color/black"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:text="Camera"/>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="0.5"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:id="@+id/cancelButton">
+
+
+                        <ImageView
+                            android:textColor="#FFFFFF"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="center"
+                            android:textSize="20sp"
+                            android:background="@drawable/cancel"/>
+
+                        <TextView
+                            android:textColor="@color/black"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:text="Cancel"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="0.5"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:id="@+id/cameraButton">
+
+                        <ImageView
+                            android:textColor="#FFFFFF"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:textSize="20sp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/camera"/>
+
+                        <TextView
+                            android:textColor="@color/black"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:text="Camera"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="0.5"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:id="@+id/toolsButton">
+
+                        <ImageView
+                            android:textColor="#FFFFFF"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:textSize="20sp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/group"/>
+
+                        <TextView
+                            android:textColor="@color/black"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:text="Tools"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="0.5"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:id="@+id/editButton">
+
+                        <ImageView
+                            android:textColor="#FFFFFF"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:paddingTop="5dp"
+                            android:layout_gravity="center"
+                            android:id="@+id/sign_image"
+                            android:background="@drawable/filter"/>
+
+                        <TextView
+                            android:textColor="@color/black"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/sign_text"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:text="Filter"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="0.5"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:id="@+id/okButton">
+
+
+                        <ImageView
+                            android:textColor="#FFFFFF"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="center"
+                            android:textSize="20sp"
+                            android:background="@drawable/save2"/>
+
+                        <TextView
+                            android:textColor="@color/black"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:text="Save"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:id="@+id/seekBarButtonsLayout"
+                    android:visibility="gone">
+
+                    <Button
+                        android:layout_width="0dp"
+                        android:layout_weight="0.5"
+                        android:layout_height="match_parent"
+                        android:id="@+id/cancelEditButton"
+                        android:background="@android:color/transparent"
+                        android:text="CANCEL"/>
+
+                    <Button
+                        android:layout_width="0dp"
+                        android:layout_weight="0.5"
+                        android:id="@+id/acceptEditButton"
+                        android:background="@android:color/transparent"
+                        android:layout_height="match_parent"
+                        android:text="ACCEPT"/>
+
+
+                </LinearLayout>
+
 
             </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="0.5"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:id="@+id/editButton">
-
-                <ImageView
-                    android:textColor="#FFFFFF"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:textSize="20sp"
-                    android:layout_gravity="center"
-                    android:id="@+id/sign_image"
-                    android:background="@drawable/sign"/>
-
-                <TextView
-                    android:textColor="@color/black"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/sign_text"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:text="Edit"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="0.5"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:id="@+id/okButton">
-
-
-                <ImageView
-                    android:textColor="#FFFFFF"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_gravity="center"
-                    android:textSize="20sp"
-                    android:background="@drawable/save2"/>
-
-                <TextView
-                    android:textColor="@color/black"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:text="Save"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
+        </RelativeLayout>
 
         <!--
         <LinearLayout

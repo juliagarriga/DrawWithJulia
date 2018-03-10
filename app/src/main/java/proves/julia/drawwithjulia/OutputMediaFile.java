@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import java.io.File;
+import java.util.Random;
 
 /**
  * Created by julia on 03/08/16.
@@ -12,18 +13,24 @@ import java.io.File;
 public class OutputMediaFile {
 
     private Activity activity;
+    private Random random;
 
     public OutputMediaFile(Activity activity) {
 
         this.activity = activity;
+        random = new Random();
     }
 
-    /** Create a file Uri for saving an image or video */
+    /**
+     * Create a file Uri for saving an image or video
+     */
     public Uri getOutputMediaFileUri(String filename) {
-            return Uri.fromFile(getOutputMediaFile(filename));
+        return Uri.fromFile(getOutputMediaFile(filename));
     }
 
-    /** Create a File for saving an image or video */
+    /**
+     * Create a File for saving an image or video
+     */
     public File getOutputMediaFile(String filename) {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
@@ -35,8 +42,8 @@ public class OutputMediaFile {
         // between applications and persist after your app has been uninstalled.
 
         // Create the storage directory if it does not exist
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()){
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
                 Log.d("OMF", "failed to create directory");
                 return null;
             }
@@ -44,8 +51,8 @@ public class OutputMediaFile {
 
         File mediaFile;
 
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator + filename +
-                    ".png");
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator + filename + "_" + String.format("%09d", random.nextInt()) +
+                ".png");
 
         return mediaFile;
     }

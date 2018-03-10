@@ -20,7 +20,7 @@ public class MyPath extends Path {
 
     public void erase() {
 
-        this.isErased =  true;
+        this.isErased = true;
     }
 
     public void unerase() {

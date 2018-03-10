@@ -1,149 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/parentLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/parentLayout"
-    android:background="@color/white"
-    android:animateLayoutChanges="true">
+    android:animateLayoutChanges="true"
+    android:background="@color/white">
 
     <ImageView
+        android:id="@+id/backgroundImage"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/backgroundImage"/>
+        android:layout_height="match_parent" />
 
     <com.byox.drawview.views.DrawView
         android:id="@+id/draw_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </com.byox.drawview.views.DrawView>
+        android:layout_height="match_parent"></com.byox.drawview.views.DrawView>
 
     <LinearLayout
+        android:id="@+id/rightLayout"
         android:layout_width="65dp"
         android:layout_height="0dp"
-        android:orientation="vertical"
         android:layout_gravity="bottom|right"
+        android:background="@drawable/black_line_top"
         android:gravity="center"
-        android:id="@+id/rightLayout"
-        android:background="@drawable/black_line_top">
+        android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/curveButton"
             android:layout_width="match_parent"
-            android:layout_weight="0.5"
             android:layout_height="0dp"
             android:layout_gravity="center"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:orientation="vertical"
-            android:id="@+id/curveButton">
+            android:orientation="vertical">
 
 
             <ImageView
-                android:textColor="#FFFFFF"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:textSize="20sp"
-                android:background="@drawable/curve"/>
+                android:background="@drawable/curve"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
 
             <TextView
-                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/curve"/>
+                android:text="@string/curve"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/lineButton"
             android:layout_width="match_parent"
-            android:layout_weight="0.5"
             android:layout_height="0dp"
             android:layout_gravity="center"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:orientation="vertical"
-            android:id="@+id/lineButton">
+            android:orientation="vertical">
 
 
             <ImageView
-                android:textColor="#FFFFFF"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:textSize="20sp"
-                android:background="@drawable/line"/>
+                android:background="@drawable/line"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
 
             <TextView
-                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/line"/>
+                android:text="@string/line"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/arrowButton"
             android:layout_width="match_parent"
-            android:layout_weight="0.5"
             android:layout_height="0dp"
             android:layout_gravity="center"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:orientation="vertical"
-            android:id="@+id/arrowButton">
+            android:orientation="vertical">
 
             <ImageView
-                android:textColor="#FFFFFF"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:textSize="20sp"
                 android:layout_gravity="center"
-                android:background="@drawable/arrow"/>
+                android:background="@drawable/arrow"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
 
             <TextView
-                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/arrow"/>
+                android:text="@string/arrow"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/rectangleButton"
             android:layout_width="match_parent"
-            android:layout_weight="0.5"
             android:layout_height="0dp"
             android:layout_gravity="center"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:orientation="vertical"
-            android:id="@+id/rectangleButton">
+            android:orientation="vertical">
 
             <ImageView
-                android:textColor="#FFFFFF"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:textSize="20sp"
                 android:layout_gravity="center"
-                android:background="@drawable/rectangle"/>
+                android:background="@drawable/rectangle"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
 
             <TextView
-                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/rectangle"/>
+                android:text="@string/rectangle"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/circleButton"
             android:layout_width="match_parent"
-            android:layout_weight="0.5"
             android:layout_height="0dp"
             android:layout_gravity="center"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:orientation="vertical"
-            android:id="@+id/circleButton">
+            android:orientation="vertical">
 
 
             <ImageView
@@ -155,328 +154,328 @@
                 android:textSize="20sp" />
 
             <TextView
-                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/circle"/>
+                android:text="@string/circle"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
 
         <LinearLayout
+            android:id="@+id/ellipseButton"
             android:layout_width="match_parent"
-            android:layout_weight="0.5"
             android:layout_height="0dp"
             android:layout_gravity="center"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:orientation="vertical"
-            android:id="@+id/ellipseButton">
+            android:orientation="vertical">
 
 
             <ImageView
-                android:textColor="#FFFFFF"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:textSize="20sp"
-                android:background="@drawable/ellipse"/>
+                android:background="@drawable/ellipse"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
 
             <TextView
-                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/ellipse"/>
+                android:text="@string/ellipse"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_weight="0.28"
             android:layout_height="0dp"
             android:layout_gravity="center"
+            android:layout_weight="0.28"
+            android:background="@android:color/transparent"
             android:gravity="center"
-            android:orientation="vertical"
-            android:background="@android:color/transparent">
+            android:orientation="vertical">
 
         </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/topLayout"
         android:layout_width="250dp"
         android:layout_height="60dp"
-        android:orientation="horizontal"
         android:layout_gravity="top"
+        android:background="@android:color/transparent"
         android:gravity="center"
-        android:id="@+id/topLayout"
-        android:background="@android:color/transparent">
+        android:orientation="horizontal">
 
 
         <LinearLayout
+            android:id="@+id/undoButton"
             android:layout_width="0dp"
-            android:layout_weight="0.5"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:orientation="vertical"
-            android:id="@+id/undoButton">
+            android:orientation="vertical">
 
 
             <ImageView
-                android:textColor="#FFFFFF"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:textSize="20sp"
-                android:background="@drawable/undo"/>
+                android:background="@drawable/undo"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
 
             <TextView
-                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/undo"/>
+                android:text="@string/undo"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/redoButton"
             android:layout_width="0dp"
-            android:layout_weight="0.5"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:orientation="vertical"
-            android:id="@+id/redoButton">
+            android:orientation="vertical">
 
             <ImageView
-                android:textColor="#FFFFFF"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:textSize="20sp"
                 android:layout_gravity="center"
-                android:background="@drawable/redo"/>
+                android:background="@drawable/redo"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
 
             <TextView
-                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/redo"/>
+                android:text="@string/redo"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
 
         <LinearLayout
+            android:id="@+id/applyButton"
             android:layout_width="0dp"
-            android:layout_weight="0.5"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:orientation="vertical"
-            android:id="@+id/saveButton">
+            android:orientation="vertical">
 
 
             <ImageView
-                android:textColor="#FFFFFF"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:textSize="20sp"
-                android:background="@drawable/save2"/>
+                android:background="@drawable/save2"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
 
             <TextView
-                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/save"/>
+                android:text="@string/apply"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/bottomLayout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:orientation="horizontal"
         android:layout_gravity="bottom"
+        android:background="@drawable/black_line_top"
         android:gravity="center"
-        android:id="@+id/bottomLayout"
-        android:background="@drawable/black_line_top">
+        android:orientation="horizontal">
 
         <LinearLayout
+            android:id="@+id/drawAttrButton"
             android:layout_width="0dp"
-            android:layout_weight="0.5"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:orientation="vertical"
-            android:id="@+id/drawAttrButton">
+            android:orientation="vertical">
 
             <ImageView
-                android:textColor="#FFFFFF"
                 android:layout_width="40dp"
                 android:layout_height="30dp"
-                android:textSize="20sp"
                 android:layout_gravity="center"
-                android:background="@drawable/draw_attr"/>
+                android:background="@drawable/draw_attr"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
 
             <TextView
-                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/drawAttr"/>
+                android:text="@string/drawAttr"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/eraseButton"
             android:layout_width="0dp"
-            android:layout_weight="0.5"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:orientation="vertical"
-            android:id="@+id/eraseButton">
+            android:orientation="vertical">
 
             <ImageView
-                android:textColor="#FFFFFF"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:textSize="20sp"
                 android:layout_gravity="center"
-                android:background="@drawable/rubber"/>
+                android:background="@drawable/rubber"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
 
             <TextView
-                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/rubber"/>
+                android:text="@string/rubber"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/pencilButton"
             android:layout_width="0dp"
-            android:layout_weight="0.5"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:orientation="vertical"
-            android:id="@+id/pencilButton">
+            android:orientation="vertical">
 
 
             <ImageView
-                android:textColor="#FFFFFF"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:textSize="20sp"
-                android:background="@drawable/pencil"/>
+                android:background="@drawable/pencil"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
 
             <TextView
-                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/pen"/>
+                android:text="@string/pen"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/moveButton"
             android:layout_width="0dp"
-            android:layout_weight="0.5"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:orientation="vertical"
-            android:id="@+id/moveButton">
+            android:orientation="vertical">
 
 
             <ImageView
-                android:textColor="#FFFFFF"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:textSize="20sp"
-                android:background="@drawable/move"/>
+                android:background="@drawable/move"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
 
             <TextView
-                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/move"/>
+                android:text="@string/move"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/textButton"
             android:layout_width="0dp"
-            android:layout_weight="0.5"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:orientation="vertical"
-            android:id="@+id/textButton">
+            android:orientation="vertical">
 
 
             <ImageView
-                android:textColor="#FFFFFF"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:textSize="20sp"
-                android:background="@drawable/text"/>
+                android:background="@drawable/text"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
 
             <TextView
-                android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/text"/>
+                android:text="@string/text"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 
 
         <LinearLayout
+            android:id="@+id/figuresButton"
             android:layout_width="0dp"
-            android:layout_weight="0.5"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:orientation="vertical"
-            android:id="@+id/figuresButton">
+            android:orientation="vertical">
 
 
             <ImageView
-                android:textColor="#FFFFFF"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_gravity="center"
-                android:textSize="20sp"
                 android:id="@+id/figuresImage"
-                android:src="@drawable/group"/>
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:src="@drawable/group"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
 
             <TextView
-                android:textColor="@color/black"
-                android:layout_width="wrap_content"
                 android:id="@+id/figuresText"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/figures"/>
+                android:text="@string/figures"
+                android:textColor="@color/black" />
 
         </LinearLayout>
 

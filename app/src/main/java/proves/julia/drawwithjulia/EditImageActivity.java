@@ -1,10 +1,11 @@
 package proves.julia.drawwithjulia;
 
 import android.animation.LayoutTransition;
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.byox.drawview.enums.DrawingCapture;
 import com.byox.drawview.enums.DrawingMode;
 import com.byox.drawview.enums.DrawingTool;
 import com.byox.drawview.views.DrawView;
@@ -31,7 +33,7 @@ public class EditImageActivity extends AppCompatActivity {
     private FrameLayout parentLayout;
     private LinearLayout pencilButton, undoButton, redoButton, eraseButton, textButton,
             figuresButton, rightLayout, lineButton, arrowButton, rectangleButton,
-            circleButton, ellipseButton, drawAttrButton, moveButton, curveButton;
+            circleButton, ellipseButton, drawAttrButton, moveButton, curveButton, applyButton;
     private ImageView figuresImage, backgroundImage;
     private TextView figuresText;
     private Bitmap bitmap;
@@ -106,6 +108,7 @@ public class EditImageActivity extends AppCompatActivity {
         rectangleButton = (LinearLayout) findViewById(R.id.rectangleButton);
         circleButton = (LinearLayout) findViewById(R.id.circleButton);
         ellipseButton = (LinearLayout) findViewById(R.id.ellipseButton);
+        applyButton = findViewById(R.id.applyButton);
 
         figuresImage = (ImageView) findViewById(R.id.figuresImage);
         figuresText = (TextView) findViewById(R.id.figuresText);
@@ -152,6 +155,13 @@ public class EditImageActivity extends AppCompatActivity {
                 // For make Redo action
                 if (myDrawView.canRedo())
                     myDrawView.redo();
+            }
+        });
+
+        applyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                saveDraw();
             }
         });
 
@@ -250,6 +260,32 @@ public class EditImageActivity extends AppCompatActivity {
         });
     }
 
+    private void saveDraw() {
+        SaveBitmapDialog saveBitmapDialog = SaveBitmapDialog.newInstance();
+        Object[] createCaptureResponse = myDrawView.createCapture(DrawingCapture.BITMAP);
+        Bitmap drawBitmap;
+
+        if (bitmap != null) {
+            drawBitmap = overlay(bitmap, (Bitmap) createCaptureResponse[0]);
+        } else {
+            drawBitmap = (Bitmap) createCaptureResponse[0];
+        }
+        saveBitmapDialog.setPreviewBitmap(drawBitmap);
+        saveBitmapDialog.setPreviewFormat(String.valueOf(createCaptureResponse[1]));
+        saveBitmapDialog.setOnSaveBitmapListener(new SaveBitmapDialog.OnSaveBitmapListener() {
+            @Override
+            public void onSaveBitmapCompleted() {
+                // make toast
+            }
+
+            @Override
+            public void onSaveBitmapCanceled() {
+                // make toast
+            }
+        });
+        saveBitmapDialog.show(getSupportFragmentManager(), "saveBitmap");
+    }
+
     private void invertRightLayout() {
 
         ViewGroup.LayoutParams params = rightLayout.getLayoutParams();
@@ -322,5 +358,13 @@ public class EditImageActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private static Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
+        Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
+        Canvas canvas = new Canvas(bmOverlay);
+        canvas.drawBitmap(bmp1, new Matrix(), null);
+        canvas.drawBitmap(bmp2, 0, 0, null);
+        return bmOverlay;
     }
 }

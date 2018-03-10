@@ -3,46 +3,34 @@ package proves.julia.drawwithjulia;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class CanvasView extends View {
 
 
+    private static final float TOLERANCE = 5;
+    Context context;
     private Paint mPenPainter;
-
     private Bitmap mBitmap;
     private Canvas mCanvas;
-
     private MyPath mPath;
-
-    Context context;
-
     private boolean isEraseMode;
-
     private Paint mPaint;
-
     private float mX, mY;
-
-    private static final float TOLERANCE = 5;
     private ArrayList<MyPath> paths, undonePaths;
 
 
-    private int paintColor = 0xFFFF0000;;
+    private int paintColor = 0xFFFF0000;
+    ;
 
     public CanvasView(Context c, AttributeSet attrs) {
 
@@ -137,7 +125,7 @@ public class CanvasView extends View {
             MyPath p = paths.get(paths.size() - 1);
 
             if (p.isErased())
-                for (MyPath path: paths)
+                for (MyPath path : paths)
                     if (path.getId() == p.getId())
                         path.unerase();
 
@@ -157,7 +145,7 @@ public class CanvasView extends View {
             MyPath p = undonePaths.get(undonePaths.size() - 1);
 
             if (p.isErased())
-                for (MyPath path: paths)
+                for (MyPath path : paths)
                     if (path.getId() == p.getId())
                         path.erase();
 
@@ -259,39 +247,39 @@ public class CanvasView extends View {
 
         } else {*/
 
-            switch (event.getAction()) {
+        switch (event.getAction()) {
 
-                case MotionEvent.ACTION_DOWN:
-
-
-                    mX = event.getX();
-
-                    mY = event.getY();
+            case MotionEvent.ACTION_DOWN:
 
 
-                    startTouch(x, y);
-                    invalidate();
+                mX = event.getX();
 
-                    break;
-
-                case MotionEvent.ACTION_MOVE:
+                mY = event.getY();
 
 
-                    moveTouch(x, y);
+                startTouch(x, y);
+                invalidate();
 
-                    invalidate();
+                break;
 
-                    break;
+            case MotionEvent.ACTION_MOVE:
 
-                case MotionEvent.ACTION_UP:
 
-                    upTouch();
-                    invalidate();
+                moveTouch(x, y);
 
-                    break;
-            }
+                invalidate();
 
-            return true;
+                break;
+
+            case MotionEvent.ACTION_UP:
+
+                upTouch();
+                invalidate();
+
+                break;
+        }
+
+        return true;
 
     }
 

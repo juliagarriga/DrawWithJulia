@@ -6,6 +6,7 @@
 
     <!-- Edit buttons -->
     <string name="save">Save</string>
+    <string name="apply">Apply</string>
     <string name="undo">Undo</string>
     <string name="redo">Redo</string>
     <string name="pen">Pen</string>
@@ -14,6 +15,14 @@
     <string name="drawAttr">Draw Attr</string>
     <string name="text">Text</string>
     <string name="figures">Figures</string>
+
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+
+    <string name="ok">OK</string>
+
+    <string name="delete_images">Vols esborrar les imatges?</string>
+    <string name="delete_image">Vols esborrar la imatge?</string>
 
     <!-- Figures buttons -->
     <string name="curve">Curve</string>
