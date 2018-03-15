@@ -15,6 +15,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Display;
 import android.view.Surface;
 import android.view.View;
@@ -34,7 +36,7 @@ public class ActivityGallery extends Activity {
     private static GalleryAdapter adapter;
     private static ArrayList<MyImage> images;
     private ImageButton addButton, add2Button;
-    private GridView gridView;
+    private RecyclerView recyclerView;
     private long service;
     private Uri uri;
     private String num_session;
@@ -90,17 +92,23 @@ public class ActivityGallery extends Activity {
 
         if (files != null) {
             for (File file : files) {
-                images.add(new MyImage(file));
+                if (file.length() != 0L)
+                    images.add(new MyImage(file));
                 /*if (file.getName().contains("PIC")) {
                     images.add(new MyImage(file));
                 }*/
             }
         }
 
-        gridView = findViewById(R.id.gridView);
+        recyclerView = findViewById(R.id.gridView);
+
+        recyclerView.setHasFixedSize(true);
+
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), Constants.NUM_VERTICAL_IMAGES);
+        recyclerView.setLayoutManager(layoutManager);
 
         adapter = new GalleryAdapter(this, images);
-        gridView.setAdapter(adapter);
+        recyclerView.setAdapter(adapter);
 
         setButtons();
 
@@ -172,9 +180,8 @@ public class ActivityGallery extends Activity {
 
         if (files != null) {
             for (File file : files) {
-                if (file.getName().contains("PIC")) {
+                if (file.length() != 0L)
                     images.add(new MyImage(file));
-                }
             }
         }
 
@@ -241,6 +248,7 @@ public class ActivityGallery extends Activity {
                 startCamera();
 
             }
+
             dataChanged();
         }
     }

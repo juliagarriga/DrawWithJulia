@@ -49,24 +49,28 @@ public class EditImageActivity extends AppCompatActivity {
 
         try {
 
-            final String filepath = getIntent().getStringExtra("path");
+            String filepath = getIntent().getStringExtra("path");
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+
+            //Set phone metrics
+            DisplayMetrics displaymetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+
+            options.inSampleSize = 2;
+            options.inJustDecodeBounds = false;
+            bitmap = BitmapFactory.decodeFile(filepath, options);
+
+            int brightness = getIntent().getIntExtra("brightness", 100);
+
+            if (brightness != 100)
+                bitmap = MainActivity.applyLightness(bitmap, brightness);
 
             myDrawView.post(new Runnable() {
                 @Override
                 public void run() {
                     try {
-
-                        BitmapFactory.Options options = new BitmapFactory.Options();
-                        options.inJustDecodeBounds = true;
-
-                        //Set phone metrics
-                        DisplayMetrics displaymetrics = new DisplayMetrics();
-                        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-
-                        options.inSampleSize = 2;
-                        options.inJustDecodeBounds = false;
-
-                        bitmap = BitmapFactory.decodeFile(filepath, options);
 
                         backgroundImage.setImageBitmap(bitmap);
                         myDrawView.setBackgroundColor(Color.TRANSPARENT);

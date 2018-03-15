@@ -2,6 +2,7 @@ package com.byox.drawview.dictionaries;
 
 import com.byox.drawview.utils.SerializablePath;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import java.util.List;
  * Created by julia on 2/27/18.
  */
 
-public class Move {
+public class Move implements Serializable {
 
     private SerializablePath path;
     private float startX, startY, endX, endY;

@@ -7,8 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
@@ -124,16 +122,10 @@ public class MainActivity extends Activity {
         toolsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    FileOutputStream out = new FileOutputStream(filepath);
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (NullPointerException e) {
 
-                }
                 Intent intent = new Intent(MainActivity.this, EditImageActivity.class);
                 intent.putExtra("path", filepath);
+                intent.putExtra("brightness", brightnessProgress);
                 startActivity(intent);
 
             }
@@ -227,7 +219,7 @@ public class MainActivity extends Activity {
 
     }
 
-    private Bitmap applyLightness(Bitmap bmp, int progress) {
+    public static Bitmap applyLightness(Bitmap bmp, int progress) {
 
         PorterDuffColorFilter porterDuffColorFilter;
 
