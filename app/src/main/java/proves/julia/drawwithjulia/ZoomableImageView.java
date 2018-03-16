@@ -57,6 +57,8 @@ public class ZoomableImageView extends View {
     private Handler mHandler = new Handler();
     private GestureDetector gestureDetector;
     private int defaultScale;
+    private boolean isZoomed = false;
+
     private Runnable mUpdateImagePositionTask = new Runnable() {
         public void run() {
             float[] mvals;
@@ -171,12 +173,21 @@ public class ZoomableImageView extends View {
         defaultScale = ZoomableImageView.DEFAULT_SCALE_FIT_INSIDE;
     }
 
+    public Matrix getMatrix() {
+
+        return matrix;
+    }
+
     public int getDefaultScale() {
         return defaultScale;
     }
 
     public void setDefaultScale(int defaultScale) {
         this.defaultScale = defaultScale;
+    }
+
+    public boolean isZoomed() {
+        return  isZoomed;
     }
 
     private void initPaints() {
@@ -337,6 +348,7 @@ public class ZoomableImageView extends View {
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 if (isAnimating == false) {
+                    isZoomed = true;
                     savedMatrix.set(matrix);
                     start.set(event.getX(), event.getY());
                     mode = DRAG;
@@ -346,6 +358,7 @@ public class ZoomableImageView extends View {
             case MotionEvent.ACTION_POINTER_DOWN:
                 oldDist = spacing(event);
                 if (oldDist > 10f) {
+                    isZoomed = true;
                     savedMatrix.set(matrix);
                     midPoint(mid, event);
                     mode = ZOOM;

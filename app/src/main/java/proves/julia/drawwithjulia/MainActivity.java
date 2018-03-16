@@ -14,6 +14,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
@@ -25,30 +26,32 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
+import com.byox.drawview.enums.DrawingCapture;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
-    private static final int MEDIA_TYPE_IMAGE = 1;
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_EDIT_IMAGE = 1;
+    private static final int REQUEST_IMAGE_CAPTURE = 2;
     private static final String TAG = "MainActivity";
 
-    private LinearLayout okButton, cancelButton, cameraButton, filterButton, toolsButton,
-            editLayout, contrastButton, brightnessButton, adjustButton, configLayout,
-            buttonsLayout, seekBarButtonsLayout;
+    private LinearLayout okButton, cancelButton, cameraButton, toolsButton,
+            editLayout, brightnessButton, buttonsLayout, seekBarButtonsLayout;
     private Button cancelEditButton, acceptEditButton;
     private SeekBar seekBar;
-    private ImageView image;
+    private ZoomableImageView image;
     private Matrix originalMatrix;
     private Uri uri;
     private OutputMediaFile outputMediaFile;
     private Bitmap bitmap;
     private String filepath;
-    private Edits actualEdit = Edits.NONE;
-    private int contrastProgress, brightnessProgress;
+    private int brightnessProgress;
+    private boolean isModified;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,27 +60,25 @@ public class MainActivity extends Activity {
 
         outputMediaFile = new OutputMediaFile(this);
 
+        isModified = false;
+
         setLayouts();
     }
 
     private void setLayouts() {
 
-        image = (ImageView) findViewById(R.id.image);
+        image = findViewById(R.id.image);
 
         okButton = (LinearLayout) findViewById(R.id.okButton);
-        filterButton = (LinearLayout) findViewById(R.id.editButton);
         cancelButton = (LinearLayout) findViewById(R.id.cancelButton);
         cameraButton = (LinearLayout) findViewById(R.id.cameraButton);
         toolsButton = (LinearLayout) findViewById(R.id.toolsButton);
-        contrastButton = (LinearLayout) findViewById(R.id.contrastButton);
         brightnessButton = (LinearLayout) findViewById(R.id.brightnessButton);
-        adjustButton = (LinearLayout) findViewById(R.id.adjustButton);
 
         cancelEditButton = (Button) findViewById(R.id.cancelEditButton);
         acceptEditButton = (Button) findViewById(R.id.acceptEditButton);
 
         editLayout = (LinearLayout) findViewById(R.id.editLayout);
-        configLayout = (LinearLayout) findViewById(R.id.configLayout);
         buttonsLayout = (LinearLayout) findViewById(R.id.buttonsLayout);
         seekBarButtonsLayout = (LinearLayout) findViewById(R.id.seekBarButtonsLayout);
 
@@ -91,24 +92,26 @@ public class MainActivity extends Activity {
 
                 bitmap = BitmapFactory.decodeFile(filepath);
                 image.setImageBitmap(bitmap);
-                filterButton.setVisibility(View.VISIBLE);
+                brightnessButton.setVisibility(View.VISIBLE);
 
             } else {
 
-                filterButton.setVisibility(View.GONE);
+                brightnessButton.setVisibility(View.GONE);
             }
 
         } catch (NullPointerException e) {
 
-            filterButton.setVisibility(View.GONE);
+            brightnessButton.setVisibility(View.GONE);
         }
 
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (brightnessProgress != 100 || image.isZoomed())
+                    saveDraw();
                 Intent intent = new Intent(MainActivity.this, ActivityGallery.class);
                 startActivity(intent);
-                //finish();
+                finish();
             }
         });
 
@@ -126,24 +129,8 @@ public class MainActivity extends Activity {
                 Intent intent = new Intent(MainActivity.this, EditImageActivity.class);
                 intent.putExtra("path", filepath);
                 intent.putExtra("brightness", brightnessProgress);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_EDIT_IMAGE);
 
-            }
-        });
-
-        filterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                invertEditLayout();
-            }
-        });
-
-        contrastButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                seekBar.setProgress(contrastProgress);
-                toggleVisibilities(true);
-                actualEdit = Edits.CONTRAST;
             }
         });
 
@@ -151,22 +138,17 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 seekBar.setProgress(brightnessProgress);
+                invertEditLayout();
                 toggleVisibilities(true);
-                actualEdit = Edits.BRIGHTNESS;
-            }
-        });
-
-        adjustButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleVisibilities(true);
-                actualEdit = Edits.ADJUST;
             }
         });
 
         cancelEditButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                brightnessProgress = 100;
+                image.setImageBitmap(applyLightness(bitmap, brightnessProgress));
+                invertEditLayout();
                 toggleVisibilities(true);
             }
         });
@@ -174,6 +156,7 @@ public class MainActivity extends Activity {
         acceptEditButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                invertEditLayout();
                 toggleVisibilities(true);
             }
         });
@@ -181,29 +164,29 @@ public class MainActivity extends Activity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (filepath != null) {
+                    File file = new File(filepath);
+                    file.delete();
+                    if (filepath.contains("DRW")) {
+                        file = new File(filepath.replace("DRW", "PIC"));
+                        file.delete();
+                    }
+                }
                 Intent intent = new Intent(MainActivity.this, ActivityGallery.class);
                 startActivity(intent);
+                finish();
             }
         });
 
         seekBar.setMax(200);
-        contrastProgress = 100;
         brightnessProgress = 100;
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                switch (actualEdit) {
-                    case CONTRAST:
-                        contrastProgress = i;
-                        image.setImageBitmap(applyContrast(bitmap, i));
-                        break;
+                brightnessProgress = i;
+                image.setImageBitmap(applyLightness(bitmap, i));
 
-                    case BRIGHTNESS:
-                        brightnessProgress = i;
-                        image.setImageBitmap(applyLightness(bitmap, i));
-                        break;
-                }
             }
 
             @Override
@@ -217,6 +200,21 @@ public class MainActivity extends Activity {
             }
         });
 
+    }
+
+    private void saveDraw() {
+        try {
+
+            File file = outputMediaFile.getOutputMediaFile(filepath, false);
+            file.createNewFile();
+            FileOutputStream outputStream = new FileOutputStream(file);
+            bitmap = image.getPhotoBitmap();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            // TODO: ADD TO LOG
+        }
     }
 
     public static Bitmap applyLightness(Bitmap bmp, int progress) {
@@ -243,27 +241,6 @@ public class MainActivity extends Activity {
 
     }
 
-    private Bitmap applyContrast(Bitmap bmp, int progress) {
-
-        return null;
-
-        /*addFragmentToStack(ContrastFragment.create(filepath, new OnContrastListener() {
-            @Override
-            public void onContrastPhotoCompleted(String s) {
-
-            }
-        }));*/
-    }
-
-    /*private Bitmap increaseBrightness(Bitmap bitmap, int value) {
-
-        Utils.bitmapToMat(bitmap, imageMat);
-        imageMat.convertTo(imageMat, -1, 1, value);
-        Bitmap result = Bitmap.createBitmap(imageMat.cols(), imageMat.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(imageMat, result);
-        return result;
-    }*/
-
     private void invertEditLayout() {
 
         ViewGroup.LayoutParams params = editLayout.getLayoutParams();
@@ -278,7 +255,7 @@ public class MainActivity extends Activity {
         // create Intent to take a picture and return control to the calling application
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-        uri = outputMediaFile.getOutputMediaFileUri("prova");
+        uri = outputMediaFile.getOutputMediaFileUri("PIC");
 
         intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -289,7 +266,26 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+
+        if (requestCode == REQUEST_EDIT_IMAGE) {
+            try {
+                String path = data.getStringExtra("filepath");
+
+                if (resultCode == RESULT_OK) {
+                    filepath = path;
+                    bitmap = BitmapFactory.decodeFile(filepath);
+                    image.setImageBitmap(bitmap);
+                } else if (resultCode == RESULT_CANCELED) {
+                    // if the image was saved
+                    if (path != null) {
+                        File file = new File(path);
+                        file.delete();
+                    }
+                }
+            } catch (NullPointerException e) {
+
+            }
+        } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
             try {
 
@@ -306,12 +302,12 @@ public class MainActivity extends Activity {
                         && display.getRotation() != Surface.ROTATION_270)
                     matrix.postRotate(90);
                 bitmap = Bitmap.createBitmap(captureBmp, 0, 0, captureBmp.getWidth(), captureBmp.getHeight(), matrix, true);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 60, outStream);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 60, outStream);
                 outStream.flush();
                 outStream.close();
 
                 image.setImageBitmap(bitmap);
-                filterButton.setVisibility(View.VISIBLE);
+                brightnessButton.setVisibility(View.VISIBLE);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -332,33 +328,20 @@ public class MainActivity extends Activity {
 
     private boolean toggleVisibilities(boolean toToggle) {
 
-        if (seekBar.getVisibility() == View.VISIBLE) {
+        if (seekBarButtonsLayout.getVisibility() == View.VISIBLE) {
 
-            seekBar.setVisibility(View.GONE);
             seekBarButtonsLayout.setVisibility(View.GONE);
-            configLayout.setVisibility(View.VISIBLE);
             buttonsLayout.setVisibility(View.VISIBLE);
 
             return false;
 
         } else if (toToggle) {
 
-            seekBar.setVisibility(View.VISIBLE);
             seekBarButtonsLayout.setVisibility(View.VISIBLE);
-            configLayout.setVisibility(View.GONE);
             buttonsLayout.setVisibility(View.GONE);
 
         }
 
         return true;
     }
-
-    private enum Edits {
-        NONE,
-        CONTRAST,
-        BRIGHTNESS,
-        ADJUST
-    }
-
-
 }

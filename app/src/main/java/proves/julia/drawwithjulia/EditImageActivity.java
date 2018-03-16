@@ -1,6 +1,9 @@
 package proves.julia.drawwithjulia;
 
 import android.animation.LayoutTransition;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -23,6 +26,10 @@ import com.byox.drawview.enums.DrawingMode;
 import com.byox.drawview.enums.DrawingTool;
 import com.byox.drawview.views.DrawView;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 /**
  * Created by julia on 2/14/18.
  */
@@ -37,11 +44,15 @@ public class EditImageActivity extends AppCompatActivity {
     private ImageView figuresImage, backgroundImage;
     private TextView figuresText;
     private Bitmap bitmap;
+    private String filepath;
+    private OutputMediaFile outputMediaFile;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_image);
+
+        outputMediaFile = new OutputMediaFile(this);
 
         setLayouts();
 
@@ -49,7 +60,7 @@ public class EditImageActivity extends AppCompatActivity {
 
         try {
 
-            String filepath = getIntent().getStringExtra("path");
+            filepath = getIntent().getStringExtra("path");
 
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
@@ -265,29 +276,32 @@ public class EditImageActivity extends AppCompatActivity {
     }
 
     private void saveDraw() {
-        SaveBitmapDialog saveBitmapDialog = SaveBitmapDialog.newInstance();
-        Object[] createCaptureResponse = myDrawView.createCapture(DrawingCapture.BITMAP);
-        Bitmap drawBitmap;
+        try {
+            Object[] createCaptureResponse = myDrawView.createCapture(DrawingCapture.BITMAP);
+            Bitmap drawBitmap;
+            File file;
 
-        if (bitmap != null) {
-            drawBitmap = overlay(bitmap, (Bitmap) createCaptureResponse[0]);
-        } else {
-            drawBitmap = (Bitmap) createCaptureResponse[0];
+            if (bitmap != null) {
+                drawBitmap = overlay(bitmap, (Bitmap) createCaptureResponse[0]);
+            } else {
+                drawBitmap = (Bitmap) createCaptureResponse[0];
+            }
+
+            if (filepath != null)
+                file = outputMediaFile.getOutputMediaFile(filepath, false);
+            else
+                file = outputMediaFile.getOutputMediaFile("DRW", true);
+
+            file.createNewFile();
+            filepath = file.getAbsolutePath();
+            FileOutputStream outputStream = new FileOutputStream(file);
+            drawBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            myDrawView.save();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            // TODO: ADD TO LOG
         }
-        saveBitmapDialog.setPreviewBitmap(drawBitmap);
-        saveBitmapDialog.setPreviewFormat(String.valueOf(createCaptureResponse[1]));
-        saveBitmapDialog.setOnSaveBitmapListener(new SaveBitmapDialog.OnSaveBitmapListener() {
-            @Override
-            public void onSaveBitmapCompleted() {
-                // make toast
-            }
-
-            @Override
-            public void onSaveBitmapCanceled() {
-                // make toast
-            }
-        });
-        saveBitmapDialog.show(getSupportFragmentManager(), "saveBitmap");
     }
 
     private void invertRightLayout() {
@@ -370,5 +384,45 @@ public class EditImageActivity extends AppCompatActivity {
         canvas.drawBitmap(bmp1, new Matrix(), null);
         canvas.drawBitmap(bmp2, 0, 0, null);
         return bmOverlay;
+    }
+
+    @Override
+    public void onBackPressed() {
+        final Intent intent = new Intent();
+
+        if (!myDrawView.isSaved() && myDrawView.isDrawn()) {
+            DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            saveDraw();
+                            setResult(RESULT_OK, intent);
+                            intent.putExtra("filepath", filepath);
+                            finish();
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            setResult(RESULT_CANCELED, intent);
+                            intent.putExtra("filepath", filepath);
+                            finish();
+                            break;
+                    }
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(getResources().getString(R.string.save_image)).setPositiveButton(getResources().getString(R.string.yes),
+                    clickListener)
+                    .setNegativeButton(getResources().getString(R.string.no), clickListener).show();
+
+        } else if (myDrawView.isSaved()) {
+            setResult(RESULT_OK, intent);
+            intent.putExtra("filepath", filepath);
+            finish();
+        } else {
+            setResult(RESULT_CANCELED, intent);
+            intent.putExtra("filepath", filepath);
+            finish();
+        }
     }
 }

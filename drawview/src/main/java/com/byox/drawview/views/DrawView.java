@@ -82,6 +82,9 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
     // VARS
     private boolean isForCamera = false;
 
+    private boolean isDrawn = false;
+    private boolean isSaved = false;
+
     private int mDrawColor;
     private int mDrawWidth;
     private int mDrawAlpha;
@@ -189,6 +192,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
      */
     @Override
     protected void onDraw(Canvas canvas) {
+
         mContentBitmap.eraseColor(Color.TRANSPARENT);
 
         if (isZoomEnabled()) {
@@ -199,9 +203,11 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
         // Draw canvas background
         mContentCanvas.drawRect(0, 0, mContentBitmap.getWidth(), mContentBitmap.getHeight(), mBackgroundPaint);
 
-        if (mDrawMoveBackgroundIndex != -1)
+        if (mDrawMoveBackgroundIndex != -1) {
+            isDrawn = true;
+            isSaved = false;
             drawBackgroundImage(mDrawMoveHistory.get(mDrawMoveBackgroundIndex), mContentCanvas);
-
+        }
         for (int i = 0; i < mDrawMoveHistoryIndex + 1; i++) {
             DrawMove drawMove = mDrawMoveHistory.get(i);
             if (drawMove.getDrawingMode() != null) {
@@ -494,6 +500,17 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
         super.onRestoreInstanceState(state);
     }
 
+    public boolean isDrawn() {
+        return isDrawn;
+    }
+
+    public void save() {
+        isSaved = true;
+    }
+
+    public boolean isSaved() {
+        return isSaved;
+    }
     // PRIVATE METHODS
 
     /**

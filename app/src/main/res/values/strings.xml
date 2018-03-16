@@ -21,6 +21,8 @@
 
     <string name="ok">OK</string>
 
+    <string name="save_image">Vols guardar la imatge?</string>
+
     <string name="delete_images">Vols esborrar les imatges?</string>
     <string name="delete_image">Vols esborrar la imatge?</string>
 

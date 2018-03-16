@@ -25,13 +25,13 @@ public class OutputMediaFile {
      * Create a file Uri for saving an image or video
      */
     public Uri getOutputMediaFileUri(String filename) {
-        return Uri.fromFile(getOutputMediaFile(filename));
+        return Uri.fromFile(getOutputMediaFile(filename, true));
     }
 
     /**
      * Create a File for saving an image or video
      */
-    public File getOutputMediaFile(String filename) {
+    public File getOutputMediaFile(String filename, boolean isRandom) {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
 
@@ -51,8 +51,13 @@ public class OutputMediaFile {
 
         File mediaFile;
 
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator + filename + "_" + String.format("%09d", random.nextInt()) +
-                ".png");
+        if (isRandom)
+            filename = mediaStorageDir.getPath() + File.separator + filename + "_" +
+                    String.format("%09d", Math.abs(random.nextInt())) + ".png";
+        else
+            filename = filename.replace("PIC", "DRW");
+
+        mediaFile = new File(filename);
 
         return mediaFile;
     }

@@ -93,7 +93,8 @@ public class ActivityGallery extends Activity {
         if (files != null) {
             for (File file : files) {
                 if (file.length() != 0L)
-                    images.add(new MyImage(file));
+                    if (file.getName().contains("PIC") || file.getName().contains("DRW"))
+                        images.add(new MyImage(file));
                 /*if (file.getName().contains("PIC")) {
                     images.add(new MyImage(file));
                 }*/
@@ -119,15 +120,9 @@ public class ActivityGallery extends Activity {
             @Override
             public void onClick(View view) {
 
-                startCamera();
-            }
-        });
+                Intent intent = new Intent(ActivityGallery.this, MainActivity.class);
 
-        add2Button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                startCamera();
+                startActivity(intent);
             }
         });
 
@@ -181,77 +176,12 @@ public class ActivityGallery extends Activity {
         if (files != null) {
             for (File file : files) {
                 if (file.length() != 0L)
-                    images.add(new MyImage(file));
+                    if (file.getName().contains("PIC") || file.getName().contains("DRW"))
+                        images.add(new MyImage(file));
             }
         }
 
         adapter.notifyDataSetChanged();
     }
-
-    private void startCamera() {
-
-        // create Intent to take a picture and return control to the calling application
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        uri = outputMediaFile.getOutputMediaFileUri("");
-        //If not saved, if the screen is rotated the uri happens to be null
-        Constants.uri = uri;
-
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-        // start the image capture Intent
-        startActivityForResult(intent, Constants.CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
-    }
-
-
-    /**
-     * If the image taken is accepted, this function checks if it is correctly rotated.
-     * It is compressed to a smaller size
-     *
-     * @param requestCode Used to know which activity's result we are receiving
-     * @param resultCode  Used to know which is the activity result
-     * @param data
-     */
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == Constants.CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-
-                Constants.DELETE_SERVICE = true;
-                OutputStream outStream = null;
-
-
-                try {
-
-                    Bitmap captureBmp = MediaStore.Images.Media.getBitmap(getContentResolver(), Constants.uri);
-                    File file = new File(Constants.uri.getPath());
-                    outStream = new FileOutputStream(file);
-
-                    Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-
-                    Matrix matrix = new Matrix();
-                    //If the image is not horizontal, if the width is bigger that the height means it is rotated 90º
-                    if (captureBmp.getWidth() > captureBmp.getHeight() && display.getRotation() != Surface.ROTATION_90
-                            && display.getRotation() != Surface.ROTATION_270)
-                        matrix.postRotate(90);
-                    Bitmap bitmap = Bitmap.createBitmap(captureBmp, 0, 0, captureBmp.getWidth(), captureBmp.getHeight(), matrix, true);
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 60, outStream);
-                    outStream.flush();
-                    outStream.close();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-
-                }
-
-                startCamera();
-
-            }
-
-            dataChanged();
-        }
-    }
-
 
 }
