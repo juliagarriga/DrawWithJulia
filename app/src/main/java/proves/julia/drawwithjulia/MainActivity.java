@@ -24,6 +24,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 
 import com.byox.drawview.enums.DrawingCapture;
@@ -34,7 +35,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private static final int REQUEST_EDIT_IMAGE = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 2;
@@ -49,9 +50,11 @@ public class MainActivity extends AppCompatActivity {
     private Uri uri;
     private OutputMediaFile outputMediaFile;
     private Bitmap bitmap;
+    private Bitmap drawBitmap;
     private String filepath;
     private int brightnessProgress;
     private boolean isModified;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (brightnessProgress != 100 || image.isZoomed())
+                if (brightnessProgress != 100 || image.isZoomed() || drawBitmap != null)
                     saveDraw();
                 Intent intent = new Intent(MainActivity.this, ActivityGallery.class);
                 startActivity(intent);
@@ -203,13 +206,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void saveDraw() {
-        try {
 
-            File file = outputMediaFile.getOutputMediaFile(filepath, false);
+        try {
+            File file;
+            if (filepath == null)
+                file = outputMediaFile.getOutputMediaFile("DRW", true);
+            else
+                file = outputMediaFile.getOutputMediaFile(filepath, false);
+
+            filepath = file.getAbsolutePath();
             file.createNewFile();
             FileOutputStream outputStream = new FileOutputStream(file);
             bitmap = image.getPhotoBitmap();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -264,17 +273,33 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private static Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
+        Bitmap bmOverlay = Bitmap.createBitmap(bmp2.getWidth(), bmp2.getHeight(), bmp1.getConfig());
+        Canvas canvas = new Canvas(bmOverlay);
+        canvas.drawBitmap(Bitmap.createScaledBitmap(bmp1, bmp2.getWidth(), bmp2.getHeight(), false), new Matrix(), null);
+        canvas.drawBitmap(bmp2, 0, 0, null);
+        return bmOverlay;
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == REQUEST_EDIT_IMAGE) {
+
             try {
                 String path = data.getStringExtra("filepath");
 
                 if (resultCode == RESULT_OK) {
-                    filepath = path;
-                    bitmap = BitmapFactory.decodeFile(filepath);
+
+                    drawBitmap = BitmapFactory.decodeFile(path);
+                    if (bitmap == null) {
+                        bitmap = Bitmap.createBitmap(drawBitmap.getWidth(), drawBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                        Canvas canvas = new Canvas(bitmap);
+                        canvas.drawColor(Color.WHITE);
+                    }
+                    bitmap = overlay(bitmap, drawBitmap);
                     image.setImageBitmap(bitmap);
+
                 } else if (resultCode == RESULT_CANCELED) {
                     // if the image was saved
                     if (path != null) {
@@ -287,9 +312,10 @@ public class MainActivity extends AppCompatActivity {
             }
         } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
-            try {
+            Bitmap captureBmp;
 
-                Bitmap captureBmp = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+            try {
+                captureBmp = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                 File file = new File(uri.getPath());
                 filepath = file.getAbsolutePath();
                 OutputStream outStream = new FileOutputStream(file);
@@ -301,17 +327,23 @@ public class MainActivity extends AppCompatActivity {
                 if (captureBmp.getWidth() > captureBmp.getHeight() && display.getRotation() != Surface.ROTATION_90
                         && display.getRotation() != Surface.ROTATION_270)
                     matrix.postRotate(90);
+
+                if (bitmap != null) {
+                    bitmap.recycle();
+                }
+
                 bitmap = Bitmap.createBitmap(captureBmp, 0, 0, captureBmp.getWidth(), captureBmp.getHeight(), matrix, true);
-                bitmap.compress(Bitmap.CompressFormat.PNG, 60, outStream);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outStream);
                 outStream.flush();
                 outStream.close();
+                if (drawBitmap != null)
+                    bitmap = overlay(bitmap, drawBitmap);
 
                 image.setImageBitmap(bitmap);
                 brightnessButton.setVisibility(View.VISIBLE);
 
-            } catch (Exception e) {
+            } catch (IOException e) {
                 e.printStackTrace();
-
             }
         }
     }

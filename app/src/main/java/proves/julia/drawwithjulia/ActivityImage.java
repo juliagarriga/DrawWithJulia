@@ -131,6 +131,9 @@ public class ActivityImage extends Activity {
                                         File image = images.get(position);
                                         images.remove(position);
                                         image.delete();
+                                        String path = Utilitats.getWorkFolder(ActivityImage.this, Utilitats.IMAGES).getPath();
+                                        ActivityGallery.dataChanged(path);
+                                        finish();
                                         break;
                                     // The user does not want to delete the images
                                     case DialogInterface.BUTTON_NEGATIVE:
@@ -139,7 +142,7 @@ public class ActivityImage extends Activity {
                             }
                         };
 
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getApplication());
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ActivityImage.this);
                         builder.setMessage(getResources().getString(R.string.delete_image)).setPositiveButton(getResources().getString(R.string.yes),
                                 clickListener)
                                 .setNegativeButton(getResources().getString(R.string.no), clickListener).show();

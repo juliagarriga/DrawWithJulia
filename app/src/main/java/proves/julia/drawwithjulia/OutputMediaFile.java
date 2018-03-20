@@ -50,10 +50,14 @@ public class OutputMediaFile {
         }
 
         File mediaFile;
+        String ext = ".jpg";
+
+        if (filename == "MOVE")
+            ext = ".png";
 
         if (isRandom)
             filename = mediaStorageDir.getPath() + File.separator + filename + "_" +
-                    String.format("%09d", Math.abs(random.nextInt())) + ".png";
+                    String.format("%09d", Math.abs(random.nextInt())) + ext;
         else
             filename = filename.replace("PIC", "DRW");
 

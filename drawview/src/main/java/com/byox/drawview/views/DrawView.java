@@ -204,9 +204,12 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
         mContentCanvas.drawRect(0, 0, mContentBitmap.getWidth(), mContentBitmap.getHeight(), mBackgroundPaint);
 
         if (mDrawMoveBackgroundIndex != -1) {
+            drawBackgroundImage(mDrawMoveHistory.get(mDrawMoveBackgroundIndex), mContentCanvas);
+        }
+
+        if (mDrawMoveHistoryIndex != -1) {
             isDrawn = true;
             isSaved = false;
-            drawBackgroundImage(mDrawMoveHistory.get(mDrawMoveBackgroundIndex), mContentCanvas);
         }
         for (int i = 0; i < mDrawMoveHistoryIndex + 1; i++) {
             DrawMove drawMove = mDrawMoveHistory.get(i);

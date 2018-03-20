@@ -60,7 +60,7 @@ public class EditImageActivity extends AppCompatActivity {
 
         try {
 
-            filepath = getIntent().getStringExtra("path");
+            String path = getIntent().getStringExtra("path");
 
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
@@ -71,7 +71,7 @@ public class EditImageActivity extends AppCompatActivity {
 
             options.inSampleSize = 2;
             options.inJustDecodeBounds = false;
-            bitmap = BitmapFactory.decodeFile(filepath, options);
+            bitmap = BitmapFactory.decodeFile(path, options);
 
             int brightness = getIntent().getIntExtra("brightness", 100);
 
@@ -281,21 +281,14 @@ public class EditImageActivity extends AppCompatActivity {
             Bitmap drawBitmap;
             File file;
 
-            if (bitmap != null) {
-                drawBitmap = overlay(bitmap, (Bitmap) createCaptureResponse[0]);
-            } else {
-                drawBitmap = (Bitmap) createCaptureResponse[0];
-            }
+            drawBitmap = (Bitmap) createCaptureResponse[0];
 
-            if (filepath != null)
-                file = outputMediaFile.getOutputMediaFile(filepath, false);
-            else
-                file = outputMediaFile.getOutputMediaFile("DRW", true);
+            file = outputMediaFile.getOutputMediaFile("MOVE", true);
 
             file.createNewFile();
             filepath = file.getAbsolutePath();
             FileOutputStream outputStream = new FileOutputStream(file);
-            drawBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            drawBitmap.compress(Bitmap.CompressFormat.PNG, 20, outputStream);
             myDrawView.save();
 
         } catch (IOException e) {
@@ -376,14 +369,6 @@ public class EditImageActivity extends AppCompatActivity {
 
             }
         });
-    }
-
-    private static Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
-        Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
-        Canvas canvas = new Canvas(bmOverlay);
-        canvas.drawBitmap(bmp1, new Matrix(), null);
-        canvas.drawBitmap(bmp2, 0, 0, null);
-        return bmOverlay;
     }
 
     @Override

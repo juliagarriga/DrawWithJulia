@@ -35,12 +35,8 @@ public class ActivityGallery extends Activity {
     private static ImageButton delButton;
     private static GalleryAdapter adapter;
     private static ArrayList<MyImage> images;
-    private ImageButton addButton, add2Button;
+    private ImageButton addButton;
     private RecyclerView recyclerView;
-    private long service;
-    private Uri uri;
-    private String num_session;
-    private String driver;
 
     private OutputMediaFile outputMediaFile;
 
@@ -78,9 +74,6 @@ public class ActivityGallery extends Activity {
         StrictMode.setVmPolicy(builder.build());
 
         addButton = findViewById(R.id.add_image_button);
-
-        // The bottom part of the activity (if not filled) is used as a button to initiate the camera
-        add2Button = findViewById(R.id.add_button);
 
         delButton = findViewById(R.id.delete_image_button);
 
@@ -145,7 +138,9 @@ public class ActivityGallery extends Activity {
                                 // Once deleted, the paper has to be invisible again
                                 delButton.setVisibility(View.INVISIBLE);
                                 Constants.DELETE_MODE = false;
-                                dataChanged();
+
+                                String path = Utilitats.getWorkFolder(ActivityGallery.this, Utilitats.IMAGES).getPath();
+                                dataChanged(path);
 
                                 break;
                             // The user does not want to delete the images
@@ -168,8 +163,7 @@ public class ActivityGallery extends Activity {
     /**
      * The images list is cleared and refilled with the new changes
      */
-    public void dataChanged() {
-        String path = Utilitats.getWorkFolder(this, Utilitats.IMAGES).getPath();
+    public static void dataChanged(String path) {
         File files[] = new File(path).listFiles();
         images.clear();
 
@@ -178,6 +172,8 @@ public class ActivityGallery extends Activity {
                 if (file.length() != 0L)
                     if (file.getName().contains("PIC") || file.getName().contains("DRW"))
                         images.add(new MyImage(file));
+                    else if (file.getName().contains("MOVE"))
+                        file.delete();
             }
         }
 
