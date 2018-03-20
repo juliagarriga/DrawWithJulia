@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
     private OutputMediaFile outputMediaFile;
     private Bitmap bitmap;
     private Bitmap drawBitmap;
-    private String filepath;
+    private String filepath, drawPath;
     private int brightnessProgress;
     private boolean isModified;
     private ProgressBar progressBar;
@@ -131,6 +131,7 @@ public class MainActivity extends Activity {
 
                 Intent intent = new Intent(MainActivity.this, EditImageActivity.class);
                 intent.putExtra("path", filepath);
+                intent.putExtra("drawPath", drawPath);
                 intent.putExtra("brightness", brightnessProgress);
                 startActivityForResult(intent, REQUEST_EDIT_IMAGE);
 
@@ -287,11 +288,11 @@ public class MainActivity extends Activity {
         if (requestCode == REQUEST_EDIT_IMAGE) {
 
             try {
-                String path = data.getStringExtra("filepath");
+                drawPath = data.getStringExtra("filepath");
 
                 if (resultCode == RESULT_OK) {
 
-                    drawBitmap = BitmapFactory.decodeFile(path);
+                    drawBitmap = BitmapFactory.decodeFile(drawPath);
                     if (bitmap == null) {
                         bitmap = Bitmap.createBitmap(drawBitmap.getWidth(), drawBitmap.getHeight(), Bitmap.Config.ARGB_8888);
                         Canvas canvas = new Canvas(bitmap);
@@ -302,8 +303,8 @@ public class MainActivity extends Activity {
 
                 } else if (resultCode == RESULT_CANCELED) {
                     // if the image was saved
-                    if (path != null) {
-                        File file = new File(path);
+                    if (drawPath != null) {
+                        File file = new File(drawPath);
                         file.delete();
                     }
                 }

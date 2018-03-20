@@ -21,6 +21,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.byox.drawview.enums.BackgroundScale;
+import com.byox.drawview.enums.BackgroundType;
 import com.byox.drawview.enums.DrawingCapture;
 import com.byox.drawview.enums.DrawingMode;
 import com.byox.drawview.enums.DrawingTool;
@@ -61,8 +63,9 @@ public class EditImageActivity extends AppCompatActivity {
         try {
 
             String path = getIntent().getStringExtra("path");
+            final String drawPath = getIntent().getStringExtra("drawPath");
 
-            BitmapFactory.Options options = new BitmapFactory.Options();
+            final BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
 
             //Set phone metrics
@@ -84,6 +87,9 @@ public class EditImageActivity extends AppCompatActivity {
                     try {
 
                         backgroundImage.setImageBitmap(bitmap);
+
+                        if (drawPath != null)
+                            myDrawView.setBackgroundImage(BitmapFactory.decodeFile(drawPath), BackgroundType.BITMAP, BackgroundScale.CENTER_CROP);
                         myDrawView.setBackgroundColor(Color.TRANSPARENT);
 
                     } catch (NullPointerException e) {

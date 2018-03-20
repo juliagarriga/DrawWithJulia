@@ -230,6 +230,7 @@
                 android:layout_height="30dp"
                 android:layout_gravity="center"
                 android:background="@drawable/undo"
+                android:tint="@android:color/white"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
 
