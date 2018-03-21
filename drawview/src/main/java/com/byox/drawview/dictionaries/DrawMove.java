@@ -1,9 +1,12 @@
 package com.byox.drawview.dictionaries;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
+import android.graphics.RectF;
 
 import com.byox.drawview.enums.BackgroundScale;
 import com.byox.drawview.enums.BackgroundType;
@@ -29,6 +32,7 @@ import java.util.List;
 public class DrawMove implements Serializable {
 
     private SerializablePaint mPaint;
+    private int originalColor;
     private DrawingMode mDrawingMode = null;
     private DrawingTool mDrawingTool = null;
     private List<Move> mDrawingMovesList;
@@ -37,6 +41,8 @@ public class DrawMove implements Serializable {
     private Matrix mBackgroundMatrix;
     private byte[] mBackgroundImage;
     private List<DrawMove> movedMoves;     // only for DrawingMode MOVE
+    private List<Object> movedMovesRect;    // only for DrawingMode MOVE
+    private float tempX, tempY;
 
     // METHODS
     public DrawMove() {
@@ -52,6 +58,10 @@ public class DrawMove implements Serializable {
 
     public SerializablePaint getPaint() {
         return mPaint;
+    }
+
+    public void resetColor() {
+        mPaint.setColor(originalColor);
     }
 
     public DrawingMode getDrawingMode() {
@@ -98,6 +108,7 @@ public class DrawMove implements Serializable {
 
     public void setPaint(SerializablePaint paint) {
         mPaint = paint;
+        originalColor = paint.getColor();
     }
 
     public void setDrawingMode(DrawingMode drawingMode) {
@@ -118,6 +129,15 @@ public class DrawMove implements Serializable {
 
     public void setStartY(float startY) {
         mDrawingMovesList.get(mDrawingMovesListIndex).setStartY(startY);
+    }
+
+    public void setTemp(float tempX, float tempY) {
+        this.tempX = tempX;
+        this.tempY = tempY;
+    }
+
+    public float[] getTemp() {
+        return new float[]{tempX, tempY};
     }
 
     public void setEndX(float endX) {
@@ -154,6 +174,10 @@ public class DrawMove implements Serializable {
         mDrawingMovesListIndex++;
     }
 
+    public void clearPoints() {
+        mDrawingMovesList.get(mDrawingMovesListIndex).clearPoints();
+    }
+
     public List<Float> getmPointsX() {
         return mDrawingMovesList.get(mDrawingMovesListIndex).getPointsX();
     }
@@ -162,7 +186,7 @@ public class DrawMove implements Serializable {
         return mDrawingMovesList.get(mDrawingMovesListIndex).getPointsY();
     }
 
-    public void setMove(DrawMove move) {
+    public void addMove(DrawMove move) {
         movedMoves.add(move);
     }
 

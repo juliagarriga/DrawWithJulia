@@ -73,4 +73,9 @@ public class Move implements Serializable {
     public List<Float> getPointsY() {
         return pointsY;
     }
+
+    public void clearPoints() {
+        pointsX.clear();
+        pointsY.clear();
+    }
 }

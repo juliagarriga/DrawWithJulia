@@ -316,6 +316,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
         float touchY = motionEvent.getY() / mZoomFactor + mCanvasClipBounds.top;
 
         int lastMoveIndex = 0;
+        boolean toRemove = false;
 
         if (motionEvent.getPointerCount() == 1) {
             switch (motionEvent.getActionMasked()) {
@@ -333,6 +334,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                     move.setPaint(getNewPaintParams());
                     move.setStartX(touchX);
                     move.setStartY(touchY);
+                    move.setTemp(touchX, touchY);
                     move.setEndX(touchX);
                     move.setEndY(touchY);
                     move.setDrawingMode(mDrawingMode);
@@ -353,6 +355,10 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                         path.lineTo(touchX, touchY);
                         mDrawMoveHistory.get(lastMoveIndex).setDrawingPathList(path);
                     }
+
+                    if (mDrawingMode == DrawingMode.MOVE)
+                        checkMove(mDrawMoveHistory.get(lastMoveIndex));
+
                     break;
                 case MotionEvent.ACTION_MOVE:
                     if ((mLastTouchEvent == MotionEvent.ACTION_DOWN ||
@@ -375,6 +381,11 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                                 mDrawMoveHistory.get(lastMoveIndex).getDrawingPath().lineTo(touchX, touchY);
                                 mDrawMoveHistory.get(lastMoveIndex).addPoint(touchX, touchY);
                             }
+
+                            if (mDrawingMode == DrawingMode.MOVE)
+                                moveDraw(mDrawMoveHistory.get(lastMoveIndex), false);
+
+                            mDrawMoveHistory.get(lastMoveIndex).setTemp(touchX, touchY);
                         }
                     }
                     break;
@@ -410,10 +421,12 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                         onDrawViewListener.onRequestText();
 
                     if (mDrawingMode == DrawingMode.MOVE) {
-                        if (!moveDraw(mDrawMoveHistory.get(lastMoveIndex))) {
+                        if (mDrawMoveHistory.get(lastMoveIndex).getMovedMoves().size() == 0) {
                             mDrawMoveHistory.remove(lastMoveIndex);
                             mDrawMoveHistoryIndex--;
                             lastMoveIndex--;
+                        } else {
+                            moveDraw(mDrawMoveHistory.get(lastMoveIndex), true);
                         }
                     }
 
@@ -1365,20 +1378,19 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
         return this;
     }
 
+
+
     /**
      * Searches for a drawMove in our Canvas that intersects with the actual move.
      * If there is some, it uses the actual move to move the latter.
      *
      * @param move drawMove used for moving DrawMove objects
-     * @return if an object has been moved
      */
-    public boolean moveDraw(DrawMove move) {
-
-        boolean touchedMove = false;
+    public void checkMove(DrawMove move) {
 
         for (int i = 0; i < mDrawMoveHistoryIndex; i++) {
             DrawMove drawMove = mDrawMoveHistory.get(i);
-            if (mDrawMoveHistory.get(i).getDrawingMode() != null) {
+            if (drawMove.getDrawingMode() != null) {
 
                 float x = move.getStartX();
                 float y = move.getStartY();
@@ -1386,7 +1398,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                 float vx = move.getEndX() - x;
                 float vy = move.getEndY() - y;
 
-                switch (mDrawMoveHistory.get(i).getDrawingMode()) {
+                switch (drawMove.getDrawingMode()) {
                     case DRAW:
 
                         switch (drawMove.getDrawingTool()) {
@@ -1402,69 +1414,67 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
 
                                     if (region.contains((int) x, (int) y)) {
 
-                                        touchedMove = true;
-
-                                        List<Float> pointsX = new ArrayList(mDrawMoveHistory.get(i).getmPointsX());
-                                        List<Float> pointsY = new ArrayList(mDrawMoveHistory.get(i).getmPointsY());
+                                        List<Float> pointsX = new ArrayList(drawMove.getmPointsX());
+                                        List<Float> pointsY = new ArrayList(drawMove.getmPointsY());
                                         float moveX = drawMove.getStartX() + vx;
                                         float moveY = drawMove.getStartY() + vy;
-                                        mDrawMoveHistory.get(i).addMove();
-                                        mDrawMoveHistory.get(i).setStartX(moveX);
-                                        mDrawMoveHistory.get(i).setStartY(moveY);
+                                        drawMove.addMove();
+                                        drawMove.setStartX(moveX);
+                                        drawMove.setStartY(moveY);
                                         SerializablePath newPath = new SerializablePath();
                                         newPath.moveTo(moveX, moveY);
-                                        mDrawMoveHistory.get(i).setDrawingPathList(newPath);
+                                        drawMove.setDrawingPathList(newPath);
 
                                         for (int j = 0; j < pointsX.size(); j++) {
                                             moveX = pointsX.get(j) + vx;
                                             moveY = pointsY.get(j) + vy;
-                                            mDrawMoveHistory.get(i).getDrawingPath().lineTo(moveX, moveY);
-                                            mDrawMoveHistory.get(i).addPoint(moveX, moveY);
+                                            drawMove.getDrawingPath().lineTo(moveX, moveY);
+                                            drawMove.addPoint(moveX, moveY);
                                         }
 
-                                        mDrawMoveHistory.get(i).setEndX(moveX);
-                                        mDrawMoveHistory.get(i).setEndY(moveY);
+                                        drawMove.setEndX(moveX);
+                                        drawMove.setEndY(moveY);
 
-                                        move.setMove(mDrawMoveHistory.get(i));
+                                        drawMove.getPaint().setColor(Color.RED);
+                                        move.addMove(drawMove);
                                     }
                                 }
                                 break;
 
                             case LINE:
 
-                                Region r = lineRegion(drawMove);
+                                Rect rect = rectangle(drawMove);
+                                Region r = new Region(rect);
 
                                 if (r.contains((int) x, (int) y)) {
 
-                                    touchedMove = true;
-
                                     addMove(drawMove, vx, vy);
 
-                                    move.setMove(mDrawMoveHistory.get(i));
+                                    drawMove.getPaint().setColor(Color.RED);
+                                    move.addMove(mDrawMoveHistory.get(i));
                                 }
                                 break;
                             case ARROW:
 
-                                r = lineRegion(drawMove);
+                                rect = rectangle(drawMove);
+                                r = new Region(rect);
 
                                 if (r.contains((int) x, (int) y)) {
 
-                                    touchedMove = true;
-
                                     addMove(drawMove, vx, vy);
 
-                                    move.setMove(mDrawMoveHistory.get(i));
+                                    drawMove.getPaint().setColor(Color.RED);
+                                    move.addMove(mDrawMoveHistory.get(i));
                                 }
                                 break;
                             case RECTANGLE:
 
                                 if (checkInRectangle(x, y, drawMove.getStartX(), drawMove.getStartY(), drawMove.getEndX(), drawMove.getEndY())) {
 
-                                    touchedMove = true;
-
                                     addMove(drawMove, vx, vy);
 
-                                    move.setMove(mDrawMoveHistory.get(i));
+                                    drawMove.getPaint().setColor(Color.RED);
+                                    move.addMove(mDrawMoveHistory.get(i));
                                 }
                                 break;
                             case CIRCLE:
@@ -1478,11 +1488,10 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
 
                                 if (checkInRectangle(x, y, startX, startY, endX, endY)) {
 
-                                    touchedMove = true;
-
                                     addMove(drawMove, vx, vy);
 
-                                    move.setMove(mDrawMoveHistory.get(i));
+                                    drawMove.getPaint().setColor(Color.RED);
+                                    move.addMove(mDrawMoveHistory.get(i));
                                 }
                                 break;
 
@@ -1495,11 +1504,10 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
 
                                 if (checkInRectangle(x, y, startX, startY, endX, endY)) {
 
-                                    touchedMove = true;
-
                                     addMove(drawMove, vx, vy);
 
-                                    move.setMove(mDrawMoveHistory.get(i));
+                                    drawMove.getPaint().setColor(Color.RED);
+                                    move.addMove(mDrawMoveHistory.get(i));
                                 }
                                 break;
                         }
@@ -1518,19 +1526,100 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
 
                         if (checkInRectangle(x, y, startX, startY, endX, endY)) {
 
-                            touchedMove = true;
-
                             addMove(drawMove, vx, vy);
 
-                            move.setMove(mDrawMoveHistory.get(i));
+                            drawMove.getPaint().setColor(Color.RED);
+                            move.addMove(mDrawMoveHistory.get(i));
                         }
                         break;
                 }
             }
 
         }
+    }
 
-        return touchedMove;
+    /**
+     * Moves the drawMoves selected by the user
+     *
+     * @param move drawMove used for moving DrawMove objects
+     */
+    public void moveDraw(DrawMove move, boolean lastMove) {
+
+        for (DrawMove drawMove : move.getMovedMoves()) {
+            if (drawMove.getDrawingMode() != null) {
+
+                float[] temp = move.getTemp();
+
+                float vx = move.getEndX() - temp[0];
+                float vy = move.getEndY() - temp[1];
+
+                switch (drawMove.getDrawingMode()) {
+                    case DRAW:
+
+                        switch (drawMove.getDrawingTool()) {
+
+                            case PEN:
+
+                                List<Float> pointsX = new ArrayList(drawMove.getmPointsX());
+                                List<Float> pointsY = new ArrayList(drawMove.getmPointsY());
+                                drawMove.clearPoints();
+                                float moveX = drawMove.getStartX() + vx;
+                                float moveY = drawMove.getStartY() + vy;
+                                drawMove.setStartX(moveX);
+                                drawMove.setStartY(moveY);
+                                SerializablePath newPath = new SerializablePath();
+                                newPath.moveTo(moveX, moveY);
+                                drawMove.setDrawingPathList(newPath);
+
+                                for (int j = 0; j < pointsX.size(); j++) {
+                                    moveX = pointsX.get(j) + vx;
+                                    moveY = pointsY.get(j) + vy;
+                                    drawMove.getDrawingPath().lineTo(moveX, moveY);
+                                    drawMove.addPoint(moveX, moveY);
+                                }
+
+                                drawMove.setEndX(moveX);
+                                drawMove.setEndY(moveY);
+
+                                break;
+
+                            case LINE:
+
+                                moveMove(drawMove, vx, vy);
+                                break;
+
+                            case ARROW:
+
+                                moveMove(drawMove, vx, vy);
+                                break;
+                            case RECTANGLE:
+
+                                moveMove(drawMove, vx, vy);
+                                break;
+
+                            case CIRCLE:
+
+                                moveMove(drawMove, vx, vy);
+                                break;
+
+                            case ELLIPSE:
+
+                                moveMove(drawMove, vx, vy);
+                                break;
+                        }
+
+                        break;
+                    case TEXT:
+
+                        moveMove(drawMove, vx, vy);
+                        break;
+                }
+
+                if (lastMove)
+                    drawMove.resetColor();
+            }
+
+        }
     }
 
     // PRIVATE METHODS
@@ -1567,7 +1656,20 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
         drawMove.setEndY(endY);
     }
 
-    private Region lineRegion(DrawMove drawMove) {
+    private void moveMove(DrawMove drawMove, float vx, float vy) {
+
+        float startX = drawMove.getStartX() + vx;
+        float startY = drawMove.getStartY() + vy;
+        float endX = drawMove.getEndX() + vx;
+        float endY = drawMove.getEndY() + vy;
+
+        drawMove.setStartX(startX);
+        drawMove.setStartY(startY);
+        drawMove.setEndX(endX);
+        drawMove.setEndY(endY);
+    }
+
+    private Rect rectangle(DrawMove drawMove) {
 
         float startX, startY, endX, endY;
 
@@ -1587,7 +1689,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
             startY = drawMove.getEndY();
         }
 
-        return new Region((int) startX, (int) startY,
+        return new Rect((int) startX, (int) startY,
                 (int) endX, (int) endY);
 
     }
