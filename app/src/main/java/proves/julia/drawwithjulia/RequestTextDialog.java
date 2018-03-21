@@ -2,6 +2,7 @@ package proves.julia.drawwithjulia;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 /**
  * Created by Ing. Oscar G. Medina Cruz on 09/11/2016.
@@ -45,6 +47,11 @@ public class RequestTextDialog extends DialogFragment {
 
         if (!getArguments().getString(REQ_TEXT).equals(""))
             textInputEditText.setText(getArguments().getShort(REQ_TEXT));
+
+        textInputEditText.requestFocus();
+        // Used to automatically open the keyboard
+        //InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        //imm.showSoftInput(textInputEditText, InputMethodManager.SHOW_IMPLICIT);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
                 .setView(view)

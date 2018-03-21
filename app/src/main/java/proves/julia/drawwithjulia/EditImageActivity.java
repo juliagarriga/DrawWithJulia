@@ -77,6 +77,7 @@ public class EditImageActivity extends AppCompatActivity {
             getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
 
             options.inSampleSize = 2;
+            options.inSampleSize = 2;
             options.inJustDecodeBounds = false;
             bitmap = BitmapFactory.decodeFile(path, options);
 
@@ -92,6 +93,17 @@ public class EditImageActivity extends AppCompatActivity {
 
                         backgroundImage.setImageBitmap(bitmap);
 
+                        /*if (bitmap != null) {
+
+                            undoImage.setColorFilter(getResources().getColor(R.color.buttons_tint3));
+                            redoImage.setColorFilter(getResources().getColor(R.color.buttons_tint3));
+                            applyImage.setColorFilter(getResources().getColor(R.color.buttons_tint3));
+
+                            undoText.setTextColor(getResources().getColor(R.color.buttons_tint3));
+                            redoText.setTextColor(getResources().getColor(R.color.buttons_tint3));
+                            applyText.setTextColor(getResources().getColor(R.color.buttons_tint3));
+                        }*/
+
                         if (drawPath != null)
                             myDrawView.setBackgroundImage(BitmapFactory.decodeFile(drawPath), BackgroundType.BITMAP, BackgroundScale.CENTER_CROP);
                         myDrawView.setBackgroundColor(Color.TRANSPARENT);
@@ -106,7 +118,6 @@ public class EditImageActivity extends AppCompatActivity {
 
 
         } catch (NullPointerException e) {
-
         } catch (Exception e) {
             e.printStackTrace();
         }

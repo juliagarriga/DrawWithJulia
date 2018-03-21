@@ -39,7 +39,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:tint="@drawable/buttons_tint"
+                android:tint="@color/buttons_tint"
                 android:src="@drawable/line"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
@@ -50,7 +50,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="@string/line"
-                android:textColor="@drawable/buttons_tint" />
+                android:textColor="@color/buttons_tint" />
 
         </LinearLayout>
 
@@ -67,7 +67,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:tint="@drawable/buttons_tint"
+                android:tint="@color/buttons_tint"
                 android:src="@drawable/arrow"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
@@ -78,7 +78,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="@string/arrow"
-                android:textColor="@drawable/buttons_tint" />
+                android:textColor="@color/buttons_tint" />
 
         </LinearLayout>
 
@@ -95,7 +95,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:tint="@drawable/buttons_tint"
+                android:tint="@color/buttons_tint"
                 android:src="@drawable/rectangle"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
@@ -106,7 +106,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="@string/rectangle"
-                android:textColor="@drawable/buttons_tint" />
+                android:textColor="@color/buttons_tint" />
 
         </LinearLayout>
 
@@ -124,7 +124,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:tint="@drawable/buttons_tint"
+                android:tint="@color/buttons_tint"
                 android:src="@drawable/circle"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
@@ -135,7 +135,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="@string/circle"
-                android:textColor="@drawable/buttons_tint" />
+                android:textColor="@color/buttons_tint" />
 
         </LinearLayout>
 
@@ -154,7 +154,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:tint="@drawable/buttons_tint"
+                android:tint="@color/buttons_tint"
                 android:src="@drawable/ellipse"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
@@ -165,7 +165,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="@string/ellipse"
-                android:textColor="@drawable/buttons_tint" />
+                android:textColor="@color/buttons_tint2" />
 
         </LinearLayout>
 
@@ -184,10 +184,10 @@
 
     <LinearLayout
         android:id="@+id/topLayout"
-        android:layout_width="250dp"
+        android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_gravity="top"
-        android:background="@android:color/transparent"
+        android:background="@drawable/white_transparent_gradient"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -206,7 +206,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:tint="@drawable/buttons_tint2"
+                android:tint="@color/buttons_tint2"
                 android:src="@drawable/undo"
                 android:id="@+id/undo_icon"
                 android:textSize="20sp" />
@@ -218,7 +218,7 @@
                 android:gravity="center"
                 android:id="@+id/undo_text"
                 android:text="@string/undo"
-                android:textColor="@drawable/buttons_tint2" />
+                android:textColor="@color/buttons_tint2" />
 
         </LinearLayout>
 
@@ -236,7 +236,7 @@
                 android:layout_height="30dp"
                 android:layout_gravity="center"
                 android:src="@drawable/redo"
-                android:tint="@drawable/buttons_tint2"
+                android:tint="@color/buttons_tint2"
                 android:id="@+id/redo_icon"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
@@ -248,7 +248,7 @@
                 android:id="@+id/redo_text"
                 android:gravity="center"
                 android:text="@string/redo"
-                android:textColor="@drawable/buttons_tint2"/>
+                android:textColor="@color/buttons_tint2"/>
 
         </LinearLayout>
 
@@ -268,7 +268,7 @@
                 android:layout_height="30dp"
                 android:layout_gravity="center"
                 android:src="@drawable/save2"
-                android:tint="@drawable/buttons_tint2"
+                android:tint="@color/buttons_tint2"
                 android:id="@+id/apply_icon"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
@@ -280,7 +280,7 @@
                 android:gravity="center"
                 android:id="@+id/apply_text"
                 android:text="@string/apply"
-                android:textColor="@drawable/buttons_tint2"  />
+                android:textColor="@color/buttons_tint2"  />
 
         </LinearLayout>
 
@@ -312,7 +312,7 @@
                 android:src="@drawable/draw_attr"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp"
-                android:tint="@drawable/buttons_tint" />
+                android:tint="@color/buttons_tint" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -321,7 +321,7 @@
                 android:id="@+id/drawAttr_text"
                 android:gravity="center"
                 android:text="@string/drawAttr"
-                android:textColor="@drawable/buttons_tint"  />
+                android:textColor="@color/buttons_tint"  />
 
         </LinearLayout>
 
