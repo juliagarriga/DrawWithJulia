@@ -12,6 +12,7 @@ import com.byox.drawview.enums.BackgroundScale;
 import com.byox.drawview.enums.BackgroundType;
 import com.byox.drawview.enums.DrawingMode;
 import com.byox.drawview.enums.DrawingTool;
+import com.byox.drawview.utils.SerializableMatrix;
 import com.byox.drawview.utils.SerializablePaint;
 import com.byox.drawview.utils.SerializablePath;
 
@@ -38,10 +39,9 @@ public class DrawMove implements Serializable {
     private List<Move> mDrawingMovesList;
     private int mDrawingMovesListIndex = -1;
     private String mText;
-    private Matrix mBackgroundMatrix;
+    private SerializableMatrix mBackgroundMatrix;
     private byte[] mBackgroundImage;
     private List<DrawMove> movedMoves;     // only for DrawingMode MOVE
-    private List<Object> movedMovesRect;    // only for DrawingMode MOVE
     private float tempX, tempY;
 
     // METHODS
@@ -96,7 +96,7 @@ public class DrawMove implements Serializable {
         return mText;
     }
 
-    public Matrix getBackgroundMatrix(){
+    public SerializableMatrix getBackgroundMatrix(){
         return mBackgroundMatrix;
     }
 
@@ -152,7 +152,7 @@ public class DrawMove implements Serializable {
         mText = text;
     }
 
-    public void setBackgroundImage(byte[] backgroundImage, Matrix backgroundMatrix) {
+    public void setBackgroundImage(byte[] backgroundImage, SerializableMatrix backgroundMatrix) {
         mBackgroundImage = backgroundImage;
         mBackgroundMatrix = backgroundMatrix;
     }

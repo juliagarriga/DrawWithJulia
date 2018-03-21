@@ -49,6 +49,7 @@ import com.byox.drawview.enums.DrawingOrientation;
 import com.byox.drawview.enums.DrawingTool;
 import com.byox.drawview.utils.BitmapUtils;
 import com.byox.drawview.utils.MatrixUtils;
+import com.byox.drawview.utils.SerializableMatrix;
 import com.byox.drawview.utils.SerializablePaint;
 import com.byox.drawview.utils.SerializablePath;
 import com.byox.drawview.utils.ViewUtils;
@@ -133,7 +134,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
     private ZoomRegionView mZoomRegionView;
 
     // Number of pixels error to check for when moving
-    private int Epsilon = 50;
+    private int Epsilon = 80;
 
     /**
      * Default constructor
@@ -1231,7 +1232,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
             mDrawMoveHistory = mDrawMoveHistory.subList(0, mDrawMoveHistoryIndex + 1);
 
         Bitmap bitmap = BitmapUtils.GetBitmapForDrawView(this, backgroundImage, backgroundType, 50);
-        Matrix matrix = new Matrix();
+        SerializableMatrix matrix = new SerializableMatrix();
         switch (backgroundScale) {
             case CENTER_CROP:
                 matrix = MatrixUtils.GetCenterCropMatrix(new RectF(0, 0,
@@ -1294,7 +1295,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
      */
     public DrawView setBackgroundImage(@NonNull Object backgroundImage,
                                        @NonNull BackgroundType backgroundType,
-                                       @NonNull Matrix backgroundMatrix) {
+                                       @NonNull SerializableMatrix backgroundMatrix) {
         if (!(backgroundImage instanceof File) && !(backgroundImage instanceof Bitmap) &&
                 !(backgroundImage instanceof byte[])) {
             throw new RuntimeException("Background image must be File, Bitmap or ByteArray");

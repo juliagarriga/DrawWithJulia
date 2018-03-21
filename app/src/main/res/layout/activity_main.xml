@@ -36,7 +36,6 @@
                     android:layout_height="match_parent"
                     android:id="@+id/seekBar"/>
 
-
             </LinearLayout>
 
             <LinearLayout
@@ -64,15 +63,16 @@
 
 
                         <ImageView
-                            android:textColor="#FFFFFF"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
                             android:layout_gravity="center"
+                            android:src="@drawable/cancel"
+                            android:textColor="#FFFFFF"
                             android:textSize="20sp"
-                            android:background="@drawable/cancel"/>
+                            android:tint="@drawable/buttons_tint2" />
 
                         <TextView
-                            android:textColor="@color/black"
+                            android:textColor="@drawable/buttons_tint2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
@@ -96,10 +96,11 @@
                             android:layout_height="30dp"
                             android:textSize="20sp"
                             android:layout_gravity="center"
-                            android:background="@drawable/camera"/>
+                            android:tint="@drawable/buttons_tint2"
+                            android:src="@drawable/camera"/>
 
                         <TextView
-                            android:textColor="@color/black"
+                            android:textColor="@drawable/buttons_tint2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
@@ -123,10 +124,11 @@
                             android:layout_height="30dp"
                             android:textSize="20sp"
                             android:layout_gravity="center"
-                            android:background="@drawable/group"/>
+                            android:tint="@drawable/buttons_tint2"
+                            android:src="@drawable/group"/>
 
                         <TextView
-                            android:textColor="@color/black"
+                            android:textColor="@drawable/buttons_tint2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
@@ -145,16 +147,16 @@
                         android:id="@+id/brightnessButton">
 
                         <ImageView
-                            android:textColor="#FFFFFF"
+                            android:tint="@drawable/buttons_tint2"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:paddingTop="5dp"
                             android:layout_gravity="center"
                             android:id="@+id/sign_image"
-                            android:background="@drawable/brightness"/>
+                            android:src="@drawable/brightness"/>
 
                         <TextView
-                            android:textColor="@color/black"
+                            android:textColor="@drawable/buttons_tint2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:id="@+id/sign_text"
@@ -174,15 +176,15 @@
                         android:id="@+id/okButton">
 
                         <ImageView
-                            android:textColor="#FFFFFF"
+                            android:tint="@drawable/buttons_tint2"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
                             android:layout_gravity="center"
                             android:textSize="20sp"
-                            android:background="@drawable/save2"/>
+                            android:src="@drawable/save2"/>
 
                         <TextView
-                            android:textColor="@color/black"
+                            android:textColor="@drawable/buttons_tint2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"

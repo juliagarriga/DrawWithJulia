@@ -52,7 +52,7 @@ public class MainActivity extends Activity {
     private Bitmap bitmap;
     private Bitmap drawBitmap;
     private String filepath, drawPath;
-    private int brightnessProgress;
+    private int brightnessProgress, tempBrightnessProgress;
     private boolean isModified;
     private ProgressBar progressBar;
 
@@ -150,7 +150,6 @@ public class MainActivity extends Activity {
         cancelEditButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                brightnessProgress = 100;
                 image.setImageBitmap(applyLightness(bitmap, brightnessProgress));
                 invertEditLayout();
                 toggleVisibilities(true);
@@ -160,6 +159,7 @@ public class MainActivity extends Activity {
         acceptEditButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                brightnessProgress = tempBrightnessProgress;
                 invertEditLayout();
                 toggleVisibilities(true);
             }
@@ -188,14 +188,14 @@ public class MainActivity extends Activity {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                brightnessProgress = i;
+                tempBrightnessProgress = i;
                 image.setImageBitmap(applyLightness(bitmap, i));
 
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                tempBrightnessProgress = brightnessProgress;
             }
 
             @Override
@@ -299,7 +299,7 @@ public class MainActivity extends Activity {
                         canvas.drawColor(Color.WHITE);
                     }
                     bitmap = overlay(bitmap, drawBitmap);
-                    image.setImageBitmap(bitmap);
+                    image.setImageBitmap(applyLightness(bitmap, brightnessProgress));
 
                 } else if (resultCode == RESULT_CANCELED) {
                     // if the image was saved
@@ -341,6 +341,7 @@ public class MainActivity extends Activity {
                     bitmap = overlay(bitmap, drawBitmap);
 
                 image.setImageBitmap(bitmap);
+                brightnessProgress = 100;
                 brightnessButton.setVisibility(View.VISIBLE);
 
             } catch (IOException e) {

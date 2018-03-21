@@ -26,34 +26,6 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/curveButton"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_gravity="center"
-            android:layout_weight="0.5"
-            android:gravity="center"
-            android:orientation="vertical">
-
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_gravity="center"
-                android:background="@drawable/curve"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="@string/curve"
-                android:textColor="@color/black" />
-
-        </LinearLayout>
-
-        <LinearLayout
             android:id="@+id/lineButton"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -67,7 +39,8 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:background="@drawable/line"
+                android:tint="@drawable/buttons_tint"
+                android:src="@drawable/line"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
 
@@ -77,7 +50,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="@string/line"
-                android:textColor="@color/black" />
+                android:textColor="@drawable/buttons_tint" />
 
         </LinearLayout>
 
@@ -94,7 +67,8 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:background="@drawable/arrow"
+                android:tint="@drawable/buttons_tint"
+                android:src="@drawable/arrow"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
 
@@ -104,7 +78,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="@string/arrow"
-                android:textColor="@color/black" />
+                android:textColor="@drawable/buttons_tint" />
 
         </LinearLayout>
 
@@ -121,7 +95,8 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:background="@drawable/rectangle"
+                android:tint="@drawable/buttons_tint"
+                android:src="@drawable/rectangle"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
 
@@ -131,7 +106,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="@string/rectangle"
-                android:textColor="@color/black" />
+                android:textColor="@drawable/buttons_tint" />
 
         </LinearLayout>
 
@@ -149,7 +124,8 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:background="@drawable/circle"
+                android:tint="@drawable/buttons_tint"
+                android:src="@drawable/circle"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
 
@@ -159,7 +135,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="@string/circle"
-                android:textColor="@color/black" />
+                android:textColor="@drawable/buttons_tint" />
 
         </LinearLayout>
 
@@ -178,7 +154,8 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:background="@drawable/ellipse"
+                android:tint="@drawable/buttons_tint"
+                android:src="@drawable/ellipse"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
 
@@ -188,7 +165,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="@string/ellipse"
-                android:textColor="@color/black" />
+                android:textColor="@drawable/buttons_tint" />
 
         </LinearLayout>
 
@@ -229,9 +206,9 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:background="@drawable/undo"
-                android:tint="@android:color/white"
-                android:textColor="#FFFFFF"
+                android:tint="@drawable/buttons_tint2"
+                android:src="@drawable/undo"
+                android:id="@+id/undo_icon"
                 android:textSize="20sp" />
 
             <TextView
@@ -239,8 +216,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
+                android:id="@+id/undo_text"
                 android:text="@string/undo"
-                android:textColor="@color/black" />
+                android:textColor="@drawable/buttons_tint2" />
 
         </LinearLayout>
 
@@ -257,7 +235,9 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:background="@drawable/redo"
+                android:src="@drawable/redo"
+                android:tint="@drawable/buttons_tint2"
+                android:id="@+id/redo_icon"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
 
@@ -265,9 +245,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:id="@+id/redo_text"
                 android:gravity="center"
                 android:text="@string/redo"
-                android:textColor="@color/black" />
+                android:textColor="@drawable/buttons_tint2"/>
 
         </LinearLayout>
 
@@ -286,7 +267,9 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:background="@drawable/save2"
+                android:src="@drawable/save2"
+                android:tint="@drawable/buttons_tint2"
+                android:id="@+id/apply_icon"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
 
@@ -295,8 +278,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
+                android:id="@+id/apply_text"
                 android:text="@string/apply"
-                android:textColor="@color/black" />
+                android:textColor="@drawable/buttons_tint2"  />
 
         </LinearLayout>
 
@@ -321,20 +305,23 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="30dp"
+                android:id="@+id/drawAttr_icon"
+                android:layout_width="35dp"
+                android:layout_height="26dp"
                 android:layout_gravity="center"
-                android:background="@drawable/draw_attr"
+                android:src="@drawable/draw_attr"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:tint="@drawable/buttons_tint" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:id="@+id/drawAttr_text"
                 android:gravity="center"
                 android:text="@string/drawAttr"
-                android:textColor="@color/black" />
+                android:textColor="@drawable/buttons_tint"  />
 
         </LinearLayout>
 
@@ -351,7 +338,9 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:background="@drawable/rubber"
+                android:src="@drawable/rubber"
+                android:tint="@android:color/darker_gray"
+                android:id="@+id/erase_icon"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
 
@@ -360,8 +349,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
+                android:id="@+id/erase_text"
                 android:text="@string/rubber"
-                android:textColor="@color/black" />
+                android:textColor="@android:color/darker_gray" />
 
         </LinearLayout>
 
@@ -379,7 +369,9 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:background="@drawable/pencil"
+                android:id="@+id/pen_icon"
+                android:tint="@android:color/darker_gray"
+                android:src="@drawable/pencil"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
 
@@ -387,9 +379,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:id="@+id/pen_text"
                 android:gravity="center"
                 android:text="@string/pen"
-                android:textColor="@color/black" />
+                android:textColor="@android:color/darker_gray" />
 
         </LinearLayout>
 
@@ -407,7 +400,9 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:background="@drawable/move"
+                android:id="@+id/move_icon"
+                android:src="@drawable/move"
+                android:tint="@android:color/darker_gray"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
 
@@ -415,9 +410,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:id="@+id/move_text"
                 android:gravity="center"
                 android:text="@string/move"
-                android:textColor="@color/black" />
+                android:textColor="@android:color/darker_gray" />
 
         </LinearLayout>
 
@@ -435,7 +431,9 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:background="@drawable/text"
+                android:id="@+id/text_icon"
+                android:tint="@android:color/darker_gray"
+                android:src="@drawable/text"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
 
@@ -443,9 +441,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:id="@+id/text_text"
                 android:gravity="center"
                 android:text="@string/text"
-                android:textColor="@color/black" />
+                android:textColor="@android:color/darker_gray" />
 
         </LinearLayout>
 
@@ -461,22 +460,23 @@
 
 
             <ImageView
-                android:id="@+id/figuresImage"
+                android:id="@+id/figures_icon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
                 android:src="@drawable/group"
+                android:tint="@android:color/darker_gray"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/figuresText"
+                android:id="@+id/figures_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="@string/figures"
-                android:textColor="@color/black" />
+                android:textColor="@android:color/darker_gray" />
 
         </LinearLayout>
 

@@ -43,11 +43,15 @@ public class EditImageActivity extends AppCompatActivity {
     private LinearLayout pencilButton, undoButton, redoButton, eraseButton, textButton,
             figuresButton, rightLayout, lineButton, arrowButton, rectangleButton,
             circleButton, ellipseButton, drawAttrButton, moveButton, curveButton, applyButton;
-    private ImageView figuresImage, backgroundImage;
-    private TextView figuresText;
+    private ImageView undoImage, redoImage, applyImage, penImage, eraseImage, moveImage,
+            textImage, drawAttrImage, figuresImage, backgroundImage;
+    private TextView undoText, redoText, applyText, penText, eraseText, moveText, textText,
+            drawAttrText, figuresText;
     private Bitmap bitmap;
     private String filepath;
     private OutputMediaFile outputMediaFile;
+    private ImageView selectedImage;
+    private TextView selectedText;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -123,7 +127,6 @@ public class EditImageActivity extends AppCompatActivity {
         eraseButton = (LinearLayout) findViewById(R.id.eraseButton);
         textButton = (LinearLayout) findViewById(R.id.textButton);
         figuresButton = (LinearLayout) findViewById(R.id.figuresButton);
-        curveButton = (LinearLayout) findViewById(R.id.curveButton);
         lineButton = (LinearLayout) findViewById(R.id.lineButton);
         arrowButton = (LinearLayout) findViewById(R.id.arrowButton);
         rectangleButton = (LinearLayout) findViewById(R.id.rectangleButton);
@@ -131,10 +134,25 @@ public class EditImageActivity extends AppCompatActivity {
         ellipseButton = (LinearLayout) findViewById(R.id.ellipseButton);
         applyButton = findViewById(R.id.applyButton);
 
-        figuresImage = (ImageView) findViewById(R.id.figuresImage);
-        figuresText = (TextView) findViewById(R.id.figuresText);
+        undoImage = findViewById(R.id.undo_icon);
+        redoImage = findViewById(R.id.redo_icon);
+        applyImage = findViewById(R.id.apply_icon);
+        penImage = findViewById(R.id.pen_icon);
+        eraseImage = findViewById(R.id.erase_icon);
+        moveImage = findViewById(R.id.move_icon);
+        textImage = findViewById(R.id.text_icon);
+        figuresImage = findViewById(R.id.figures_icon);
 
-        backgroundImage = (ImageView) findViewById(R.id.backgroundImage);
+        undoText = findViewById(R.id.undo_text);
+        redoText = findViewById(R.id.redo_text);
+        applyText = findViewById(R.id.apply_text);
+        penText = findViewById(R.id.pen_text);
+        eraseText = findViewById(R.id.erase_text);
+        moveText = findViewById(R.id.move_text);
+        textText = findViewById(R.id.text_text);
+        figuresText = findViewById(R.id.figures_text);
+
+        backgroundImage = findViewById(R.id.backgroundImage);
 
         parentLayout.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
 
@@ -145,11 +163,28 @@ public class EditImageActivity extends AppCompatActivity {
             }
         });
 
+        penImage.setColorFilter(getResources().getColor(android.R.color.black));
+        penText.setTextColor(getResources().getColor(android.R.color.black));
+
+        selectedImage = penImage;
+        selectedText = penText;
+
         pencilButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 myDrawView.setDrawingMode(DrawingMode.DRAW);
+                myDrawView.setDrawingTool(DrawingTool.PEN);
+                figuresImage.setImageResource(R.drawable.group);
+                figuresText.setText(getResources().getString(R.string.figures));
+
+                selectedImage.setColorFilter(getResources().getColor(android.R.color.darker_gray));
+                selectedText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+
+                penImage.setColorFilter(getResources().getColor(android.R.color.black));
+                penText.setTextColor(getResources().getColor(android.R.color.black));
+                selectedImage = penImage;
+                selectedText = penText;
             }
         });
 
@@ -157,6 +192,16 @@ public class EditImageActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 myDrawView.setDrawingMode(DrawingMode.MOVE);
+                figuresImage.setImageResource(R.drawable.group);
+                figuresText.setText(getResources().getString(R.string.figures));
+
+                selectedImage.setColorFilter(getResources().getColor(android.R.color.darker_gray));
+                selectedText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+
+                moveImage.setColorFilter(getResources().getColor(android.R.color.black));
+                moveText.setTextColor(getResources().getColor(android.R.color.black));
+                selectedImage = moveImage;
+                selectedText = moveText;
             }
         });
 
@@ -190,6 +235,16 @@ public class EditImageActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 myDrawView.setDrawingMode(DrawingMode.ERASER);
+                figuresImage.setImageResource(R.drawable.group);
+                figuresText.setText(getResources().getString(R.string.figures));
+
+                selectedImage.setColorFilter(getResources().getColor(android.R.color.darker_gray));
+                selectedText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+
+                eraseImage.setColorFilter(getResources().getColor(android.R.color.black));
+                eraseText.setTextColor(getResources().getColor(android.R.color.black));
+                selectedImage = eraseImage;
+                selectedText = eraseText;
             }
         });
 
@@ -197,6 +252,16 @@ public class EditImageActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 myDrawView.setDrawingMode(DrawingMode.TEXT);
+                figuresImage.setImageResource(R.drawable.group);
+                figuresText.setText(getResources().getString(R.string.figures));
+
+                selectedImage.setColorFilter(getResources().getColor(android.R.color.darker_gray));
+                selectedText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+
+                textImage.setColorFilter(getResources().getColor(android.R.color.black));
+                textText.setTextColor(getResources().getColor(android.R.color.black));
+                selectedImage = textImage;
+                selectedText = textText;
             }
         });
 
@@ -204,19 +269,14 @@ public class EditImageActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 invertRightLayout();
-            }
-        });
 
-        curveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+                selectedImage.setColorFilter(getResources().getColor(android.R.color.darker_gray));
+                selectedText.setTextColor(getResources().getColor(android.R.color.darker_gray));
 
-                myDrawView.setDrawingMode(DrawingMode.DRAW);
-                myDrawView.setDrawingTool(DrawingTool.PEN);
-                invertRightLayout();
-                figuresImage.setImageResource(R.drawable.group);
-                figuresText.setText(getResources().getString(R.string.figures));
-
+                figuresImage.setColorFilter(getResources().getColor(android.R.color.black));
+                figuresText.setTextColor(getResources().getColor(android.R.color.black));
+                selectedImage = figuresImage;
+                selectedText = figuresText;
             }
         });
 
