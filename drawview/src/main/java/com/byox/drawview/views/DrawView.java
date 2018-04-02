@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -135,6 +136,8 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
 
     // Number of pixels error to check for when moving
     private int Epsilon = 80;
+
+    private SharedPreferences paintPrefs;
 
     /**
      * Default constructor
@@ -611,6 +614,85 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
      * @param attrs
      */
     private void initAttributes(Context context, AttributeSet attrs) {
+
+        /*paintPrefs = context.getSharedPreferences(context.getString(R.string.preference_configuration), Context.MODE_PRIVATE);
+        int num_ticket = sharedPref.getInt(getString(R.string.saved_num_ticket), 1);
+        int num_days = sharedPref.getInt(getString(R.string.ftp_bbdd_days), 15);*/
+        TypedArray typedArray = context.getTheme().obtainStyledAttributes(
+                attrs, R.styleable.DrawView, 0, 0);
+        try {
+            mDrawColor = typedArray.getColor(R.styleable.DrawView_dv_draw_color, Color.BLACK);
+            mDrawWidth = typedArray.getInteger(R.styleable.DrawView_dv_draw_width, 3);
+            mDrawAlpha = typedArray.getInteger(R.styleable.DrawView_dv_draw_alpha, 255);
+            mAntiAlias = typedArray.getBoolean(R.styleable.DrawView_dv_draw_anti_alias, true);
+            mDither = typedArray.getBoolean(R.styleable.DrawView_dv_draw_dither, true);
+            int paintStyle = typedArray.getInteger(R.styleable.DrawView_dv_draw_style, 2);
+            if (paintStyle == 0)
+                mPaintStyle = SerializablePaint.Style.FILL;
+            else if (paintStyle == 1)
+                mPaintStyle = SerializablePaint.Style.FILL_AND_STROKE;
+            else if (paintStyle == 2)
+                mPaintStyle = SerializablePaint.Style.STROKE;
+            int cap = typedArray.getInteger(R.styleable.DrawView_dv_draw_corners, 2);
+            if (cap == 0)
+                mLineCap = SerializablePaint.Cap.BUTT;
+            else if (cap == 1)
+                mLineCap = SerializablePaint.Cap.ROUND;
+            else if (cap == 2)
+                mLineCap = SerializablePaint.Cap.SQUARE;
+            int typeface = typedArray.getInteger(R.styleable.DrawView_dv_draw_font_family, 0);
+            if (typeface == 0)
+                mFontFamily = Typeface.DEFAULT;
+            else if (typeface == 1)
+                mFontFamily = Typeface.MONOSPACE;
+            else if (typeface == 2)
+                mFontFamily = Typeface.SANS_SERIF;
+            else if (typeface == 3)
+                mFontFamily = Typeface.SERIF;
+            mFontSize = typedArray.getInteger(R.styleable.DrawView_dv_draw_font_size, 125);
+            isForCamera = typedArray.getBoolean(R.styleable.DrawView_dv_draw_is_camera, false);
+            int orientation = typedArray.getInteger(R.styleable.DrawView_dv_draw_orientation,
+                    getWidth() > getHeight() ? 1 : 0);
+            mInitialDrawingOrientation = DrawingOrientation.values()[orientation];
+            if (getBackground() != null && !isForCamera)
+                try {
+                    mBackgroundColor = ((ColorDrawable) getBackground()).getColor();
+                    setBackgroundColor(Color.TRANSPARENT);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    setBackgroundColor(Color.TRANSPARENT);
+                    mBackgroundColor = ((ColorDrawable) getBackground()).getColor();
+                    setBackgroundResource(R.drawable.drawable_transparent_pattern);
+                }
+            else {
+                setBackgroundColor(Color.TRANSPARENT);
+                mBackgroundColor = ((ColorDrawable) getBackground()).getColor();
+                if (!isForCamera)
+                    setBackgroundResource(R.drawable.drawable_transparent_pattern);
+            }
+
+            mBackgroundPaint = new SerializablePaint();
+            mBackgroundPaint.setStyle(SerializablePaint.Style.FILL);
+            mBackgroundPaint.setColor(mBackgroundColor != -1 ? mBackgroundColor : Color.TRANSPARENT);
+
+            mDrawingTool = DrawingTool.values()[typedArray.getInteger(R.styleable.DrawView_dv_draw_tool, 0)];
+            mDrawingMode = DrawingMode.values()[typedArray.getInteger(R.styleable.DrawView_dv_draw_mode, 0)];
+            mZoomEnabled = typedArray.getBoolean(R.styleable.DrawView_dv_draw_enable_zoom, false);
+            mZoomRegionScale = typedArray.getFloat(R.styleable.DrawView_dv_draw_zoomregion_scale, mZoomRegionScale);
+            mZoomRegionScaleMin = typedArray.getFloat(R.styleable.DrawView_dv_draw_zoomregion_minscale, mZoomRegionScaleMin);
+            mZoomRegionScaleMax = typedArray.getFloat(R.styleable.DrawView_dv_draw_zoomregion_maxscale, mZoomRegionScaleMax);
+        } finally {
+            typedArray.recycle();
+        }
+    }
+
+    /**
+     * Initialize view attributes
+     *
+     * @param context
+     * @param attrs
+     */
+    private void changeAttributes(Context context, AttributeSet attrs, Paint paint) {
         TypedArray typedArray = context.getTheme().obtainStyledAttributes(
                 attrs, R.styleable.DrawView, 0, 0);
         try {

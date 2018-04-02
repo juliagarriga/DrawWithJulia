@@ -1,7 +1,9 @@
 package proves.julia.drawwithjulia;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -113,6 +115,7 @@ public class MainActivity extends Activity {
                 if (brightnessProgress != 100 || image.isZoomed() || drawBitmap != null)
                     saveDraw();
                 Intent intent = new Intent(MainActivity.this, ActivityGallery.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
             }
@@ -177,6 +180,7 @@ public class MainActivity extends Activity {
                     }
                 }
                 Intent intent = new Intent(MainActivity.this, ActivityGallery.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
             }
@@ -356,8 +360,43 @@ public class MainActivity extends Activity {
         if (toggleVisibilities(false))
             if (editLayout.getLayoutParams().height != 0)
                 invertEditLayout();
-            else
+        else {
+            DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            if (brightnessProgress != 100 || image.isZoomed() || drawBitmap != null)
+                                saveDraw();
+                            Intent intent = new Intent(MainActivity.this, ActivityGallery.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            finish();
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            if (filepath != null) {
+                                File file = new File(filepath);
+                                file.delete();
+                                if (filepath.contains("DRW")) {
+                                    file = new File(filepath.replace("DRW", "PIC"));
+                                    file.delete();
+                                }
+                            }
+                            finish();
+                            break;
+                    }
+                }
+            };
+            if (drawBitmap != null || filepath != null) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage(getResources().getString(R.string.save_image)).setPositiveButton(getResources().getString(R.string.yes),
+                        clickListener)
+                        .setNegativeButton(getResources().getString(R.string.no), clickListener).show();
+
+            } else {
                 super.onBackPressed();
+            }
+        }
     }
 
     private boolean toggleVisibilities(boolean toToggle) {
