@@ -22,6 +22,10 @@
     <string name="ok">OK</string>
 
     <string name="save_image">Vols guardar la imatge?</string>
+    <string name="apply_changes">Vols aplicar els canvis?</string>
+    <string name="existing_image">La imatge ja està editada. Què vols fer?</string>
+    <string name="replace_image">Reemplaçar-la</string>
+    <string name="new_image">Crear-ne una nova</string>
 
     <string name="delete_images">Vols esborrar les imatges?</string>
     <string name="delete_image">Vols esborrar la imatge?</string>

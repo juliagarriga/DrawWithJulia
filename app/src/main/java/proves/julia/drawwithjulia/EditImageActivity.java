@@ -1,16 +1,21 @@
 package proves.julia.drawwithjulia;
 
 import android.animation.LayoutTransition;
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -21,6 +26,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.byox.drawview.enums.BackgroundScale;
 import com.byox.drawview.enums.BackgroundType;
 import com.byox.drawview.enums.DrawingCapture;
@@ -31,6 +41,10 @@ import com.byox.drawview.views.DrawView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import static android.graphics.Paint.Cap.BUTT;
+import static android.graphics.Paint.Cap.ROUND;
+import static android.graphics.Paint.Cap.SQUARE;
 
 /**
  * Created by julia on 2/14/18.
@@ -66,7 +80,7 @@ public class EditImageActivity extends AppCompatActivity {
 
         try {
 
-            String path = getIntent().getStringExtra("path");
+            final String path = getIntent().getStringExtra("path");
             final String drawPath = getIntent().getStringExtra("drawPath");
 
             final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -77,9 +91,8 @@ public class EditImageActivity extends AppCompatActivity {
             getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
 
             options.inSampleSize = 2;
-            options.inSampleSize = 2;
             options.inJustDecodeBounds = false;
-            bitmap = BitmapFactory.decodeFile(path, options);
+            //bitmap = BitmapFactory.decodeFile(path, options);
 
             int brightness = getIntent().getIntExtra("brightness", 100);
 
@@ -91,7 +104,18 @@ public class EditImageActivity extends AppCompatActivity {
                 public void run() {
                     try {
 
-                        backgroundImage.setImageBitmap(bitmap);
+                        Glide.with(EditImageActivity.this)
+                                .asBitmap()
+                                .load(path)
+                                .apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
+                                        .skipMemoryCache(true))
+                                .into(new SimpleTarget<Bitmap>() {
+                                    @Override
+                                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                        bitmap = resource;
+                                        backgroundImage.setImageBitmap(bitmap);
+                                    }
+                                });
 
                         /*if (bitmap != null) {
 
@@ -398,10 +422,65 @@ public class EditImageActivity extends AppCompatActivity {
                         .setLineCap(newPaint.getStrokeCap())
                         .setFontFamily(newPaint.getTypeface())
                         .setFontSize(newPaint.getTextSize());
+
+
+
+                //Once entered, the user information must be saved to an internal, non-deleted source
+                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
+                        getString(R.string.preference_attributes), Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putInt(getString(R.string.draw_color), newPaint.getColor());
+                int paintStyle = 2;
+                switch (newPaint.getStyle()) {
+                    case FILL:
+                        paintStyle = 0;
+                        break;
+                    case FILL_AND_STROKE:
+                        paintStyle = 1;
+                        break;
+                    case STROKE:
+                        paintStyle = 2;
+
+                }
+
+                editor.putInt(getString(R.string.draw_paint_style), paintStyle);
+                editor.putBoolean(getString(R.string.draw_dither), newPaint.isDither());
+                editor.putInt(getString(R.string.draw_alpha), newPaint.getAlpha());
+                editor.putInt(getString(R.string.draw_width), (int) newPaint.getStrokeWidth());
+                editor.putBoolean(getString(R.string.draw_anti_alias), newPaint.isAntiAlias());
+
+                int cap = 0;
+                switch (newPaint.getStrokeCap()) {
+                    case BUTT:
+                        cap = 0;
+                        break;
+                    case ROUND:
+                        cap = 1;
+                        break;
+                    case SQUARE:
+                        cap = 2;
+                        break;
+                }
+
+                editor.putInt(getString(R.string.draw_corners), cap);
+
+                int typeface = 0;
+
+                if (newPaint.getTypeface() == Typeface.MONOSPACE)
+                    typeface = 1;
+                else if (newPaint.getTypeface() == Typeface.SANS_SERIF)
+                    typeface = 2;
+                else if (newPaint.getTypeface() == Typeface.SERIF)
+                    typeface = 3;
+
+                editor.putInt(getString(R.string.draw_typeface), typeface);
+                editor.putInt(getString(R.string.font_size), (int) newPaint.getTextSize());
+                editor.commit();
 //                If you prefer, you can easily refresh new attributes using this method
 //                mDrawView.refreshAttributes(newPaint);
             }
         });
+
         drawAttribsDialog.show(getSupportFragmentManager(), "drawAttribs");
 
     }
@@ -438,7 +517,7 @@ public class EditImageActivity extends AppCompatActivity {
                         myDrawView.cancelTextRequest();
                     }
                 });
-                requestTextDialog.show(getSupportFragmentManager(), "requestText");
+                requestTextDialog.show(getFragmentManager(), "requestText");
             }
 
             @Override
@@ -473,7 +552,7 @@ public class EditImageActivity extends AppCompatActivity {
             };
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(getResources().getString(R.string.save_image)).setPositiveButton(getResources().getString(R.string.yes),
+            builder.setMessage(getResources().getString(R.string.apply_changes)).setPositiveButton(getResources().getString(R.string.yes),
                     clickListener)
                     .setNegativeButton(getResources().getString(R.string.no), clickListener).show();
 

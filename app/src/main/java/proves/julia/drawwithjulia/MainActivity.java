@@ -13,9 +13,12 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
@@ -29,7 +32,13 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.byox.drawview.enums.DrawingCapture;
+import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -47,7 +56,7 @@ public class MainActivity extends Activity {
             editLayout, brightnessButton, buttonsLayout, seekBarButtonsLayout;
     private Button cancelEditButton, acceptEditButton;
     private SeekBar seekBar;
-    private ZoomableImageView image;
+    private PhotoView image;
     private Matrix originalMatrix;
     private Uri uri;
     private OutputMediaFile outputMediaFile;
@@ -57,6 +66,8 @@ public class MainActivity extends Activity {
     private int brightnessProgress, tempBrightnessProgress;
     private boolean isModified;
     private ProgressBar progressBar;
+    private boolean new_image;
+    private boolean isFinished = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,12 +106,26 @@ public class MainActivity extends Activity {
 
             if (filepath != null) {
 
-                bitmap = BitmapFactory.decodeFile(filepath);
-                image.setImageBitmap(bitmap);
+                new_image = false;
+
+                /*bitmap = BitmapFactory.decodeFile(filepath);
+                image.setImageBitmap(bitmap);*/
+                Glide.with(this)
+                        .asBitmap()
+                        .load(filepath)
+                        .apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
+                                .skipMemoryCache(true))
+                        .into(new SimpleTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                bitmap = resource;
+                                image.setImageBitmap(bitmap);
+                            }
+                        });
                 brightnessButton.setVisibility(View.VISIBLE);
 
             } else {
-
+                new_image = true;
                 brightnessButton.setVisibility(View.GONE);
             }
 
@@ -112,12 +137,11 @@ public class MainActivity extends Activity {
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (brightnessProgress != 100 || image.isZoomed() || drawBitmap != null)
+                if (brightnessProgress != 100 || drawBitmap != null) {
                     saveDraw();
-                Intent intent = new Intent(MainActivity.this, ActivityGallery.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
+                } else {
+                    finish();
+                }
             }
         });
 
@@ -210,24 +234,63 @@ public class MainActivity extends Activity {
 
     }
 
-    private void saveDraw() {
+    private void saveFile(String filepath) {
 
         try {
-            File file;
-            if (filepath == null)
-                file = outputMediaFile.getOutputMediaFile("DRW", true);
-            else
-                file = outputMediaFile.getOutputMediaFile(filepath, false);
 
-            filepath = file.getAbsolutePath();
+            File file = new File(filepath);
             file.createNewFile();
             FileOutputStream outputStream = new FileOutputStream(file);
-            bitmap = image.getPhotoBitmap();
+            bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream);
 
         } catch (IOException e) {
             e.printStackTrace();
-            // TODO: ADD TO LOG
+        }
+    }
+
+    private void saveDraw() {
+
+        File file;
+        if (filepath == null)
+            file = outputMediaFile.getOutputMediaFile("DRW", true);
+        else
+            file = outputMediaFile.getOutputMediaFile(filepath, false);
+
+
+        filepath = file.getAbsolutePath();
+
+        final Intent intent = new Intent(MainActivity.this, ActivityGallery.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        saveFile(filepath);
+                        startActivity(intent);
+                        finish();
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        filepath += "1";
+                        saveFile(filepath);
+                        startActivity(intent);
+                        finish();
+                        break;
+                }
+            }
+        };
+
+        if (file.exists()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(getResources().getString(R.string.save_image)).setPositiveButton(getResources().getString(R.string.replace_image),
+                    clickListener)
+                    .setNegativeButton(getResources().getString(R.string.new_image), clickListener).show();
+        } else {
+            saveFile(filepath);
+            startActivity(intent);
+            finish();
         }
     }
 
@@ -292,11 +355,20 @@ public class MainActivity extends Activity {
         if (requestCode == REQUEST_EDIT_IMAGE) {
 
             try {
-                drawPath = data.getStringExtra("filepath");
+                String path = data.getStringExtra("filepath");
 
                 if (resultCode == RESULT_OK) {
 
-                    drawBitmap = BitmapFactory.decodeFile(drawPath);
+                    if (drawPath != null) {
+                        drawBitmap = overlay(BitmapFactory.decodeFile(drawPath), BitmapFactory.decodeFile(path));
+                        OutputStream outStream = new FileOutputStream(new File(drawPath));
+                        drawBitmap.compress(Bitmap.CompressFormat.PNG, 20, outStream);
+                        outStream.flush();
+                        outStream.close();
+                    } else {
+                        drawPath = path;
+                        drawBitmap = BitmapFactory.decodeFile(drawPath);
+                    }
                     if (bitmap == null) {
                         bitmap = Bitmap.createBitmap(drawBitmap.getWidth(), drawBitmap.getHeight(), Bitmap.Config.ARGB_8888);
                         Canvas canvas = new Canvas(bitmap);
@@ -307,50 +379,43 @@ public class MainActivity extends Activity {
 
                 } else if (resultCode == RESULT_CANCELED) {
                     // if the image was saved
-                    if (drawPath != null) {
-                        File file = new File(drawPath);
+                    if (path != null) {
+                        File file = new File(path);
                         file.delete();
                     }
                 }
             } catch (NullPointerException e) {
 
+                e.printStackTrace();
+
+            } catch (IOException e2) {
+
+                e2.printStackTrace();
+
             }
         } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
-            Bitmap captureBmp;
+            filepath = uri.getPath();
 
-            try {
-                captureBmp = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-                File file = new File(uri.getPath());
-                filepath = file.getAbsolutePath();
-                OutputStream outStream = new FileOutputStream(file);
+            Glide.with(this)
+                    .asBitmap()
+                    .load(uri)
+                    .apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .skipMemoryCache(true))
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            bitmap = resource;
 
-                Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+                            if (drawBitmap != null)
+                                bitmap = overlay(bitmap, drawBitmap);
 
-                Matrix matrix = new Matrix();
-                //If the image is not horizontal, if the width is bigger that the height means it is rotated 90º
-                if (captureBmp.getWidth() > captureBmp.getHeight() && display.getRotation() != Surface.ROTATION_90
-                        && display.getRotation() != Surface.ROTATION_270)
-                    matrix.postRotate(90);
+                            image.setImageBitmap(bitmap);
+                        }
+                    });
 
-                if (bitmap != null) {
-                    bitmap.recycle();
-                }
-
-                bitmap = Bitmap.createBitmap(captureBmp, 0, 0, captureBmp.getWidth(), captureBmp.getHeight(), matrix, true);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outStream);
-                outStream.flush();
-                outStream.close();
-                if (drawBitmap != null)
-                    bitmap = overlay(bitmap, drawBitmap);
-
-                image.setImageBitmap(bitmap);
-                brightnessProgress = 100;
-                brightnessButton.setVisibility(View.VISIBLE);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            brightnessProgress = 100;
+            brightnessButton.setVisibility(View.VISIBLE);
         }
     }
 
@@ -360,43 +425,38 @@ public class MainActivity extends Activity {
         if (toggleVisibilities(false))
             if (editLayout.getLayoutParams().height != 0)
                 invertEditLayout();
-        else {
-            DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    switch (which) {
-                        case DialogInterface.BUTTON_POSITIVE:
-                            if (brightnessProgress != 100 || image.isZoomed() || drawBitmap != null)
+            else {
+                DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case DialogInterface.BUTTON_POSITIVE:
                                 saveDraw();
-                            Intent intent = new Intent(MainActivity.this, ActivityGallery.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            finish();
-                            break;
-                        case DialogInterface.BUTTON_NEGATIVE:
-                            if (filepath != null) {
-                                File file = new File(filepath);
-                                file.delete();
-                                if (filepath.contains("DRW")) {
-                                    file = new File(filepath.replace("DRW", "PIC"));
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                if (filepath != null && new_image) {
+                                    File file = new File(filepath);
                                     file.delete();
+                                    if (filepath.contains("DRW")) {
+                                        file = new File(filepath.replace("DRW", "PIC"));
+                                        file.delete();
+                                    }
                                 }
-                            }
-                            finish();
-                            break;
+                                finish();
+                                break;
+                        }
                     }
-                }
-            };
-            if (drawBitmap != null || filepath != null) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(getResources().getString(R.string.save_image)).setPositiveButton(getResources().getString(R.string.yes),
-                        clickListener)
-                        .setNegativeButton(getResources().getString(R.string.no), clickListener).show();
+                };
+                if (drawBitmap != null || (new_image && filepath != null) || brightnessProgress != 100) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage(getResources().getString(R.string.save_image)).setPositiveButton(getResources().getString(R.string.yes),
+                            clickListener)
+                            .setNegativeButton(getResources().getString(R.string.no), clickListener).show();
 
-            } else {
-                super.onBackPressed();
+                } else {
+                    super.onBackPressed();
+                }
             }
-        }
     }
 
     private boolean toggleVisibilities(boolean toToggle) {

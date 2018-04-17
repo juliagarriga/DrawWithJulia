@@ -17,6 +17,10 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+
 import java.util.ArrayList;
 
 /**
@@ -46,9 +50,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        viewHolder.image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        /*viewHolder.image.setScaleType(ImageView.ScaleType.CENTER_CROP);
         BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
+        options.inJustDecodeBounds = true;*/
 
         //Set phone metrics
         DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -56,7 +60,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         int screenWidth = displaymetrics.widthPixels;
 
         // Calculates the sample size of the bitmap based on the screen dimensions.
-        options.inJustDecodeBounds = false;
+        //options.inJustDecodeBounds = false;
 
         // Depending on the rotation of the screen, the number of pictures shown in a line is different.
         Display display = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
@@ -68,9 +72,17 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         else
             imageWidth = screenWidth / Constants.NUM_VERTICAL_IMAGES;
 
-        options.inSampleSize = calculateInSampleSize(options, 100, 100);
+        /*options.inSampleSize = calculateInSampleSize(options, 100, 100);
         Bitmap scaledBitmap = BitmapFactory.decodeFile(images.get(position).getFile().getPath(), options);
-        viewHolder.image.setImageBitmap(Bitmap.createScaledBitmap(scaledBitmap, imageWidth, imageWidth, true));
+        viewHolder.image.setImageBitmap(Bitmap.createScaledBitmap(scaledBitmap, imageWidth, imageWidth, true));*/
+
+        Glide.with(mContext)
+                .load(images.get(position).getFile().getAbsolutePath())
+                .apply(new RequestOptions().override(imageWidth, imageWidth)
+                        .centerCrop()
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .skipMemoryCache(true))
+                .into(viewHolder.image);
 
         if (images.get(position).isVisible()) {
             viewHolder.del.setVisibility(View.VISIBLE);

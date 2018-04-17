@@ -615,32 +615,41 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
      */
     private void initAttributes(Context context, AttributeSet attrs) {
 
-        /*paintPrefs = context.getSharedPreferences(context.getString(R.string.preference_configuration), Context.MODE_PRIVATE);
-        int num_ticket = sharedPref.getInt(getString(R.string.saved_num_ticket), 1);
-        int num_days = sharedPref.getInt(getString(R.string.ftp_bbdd_days), 15);*/
+        // Obtain attributes from preferences, if saved...
+        paintPrefs = context.getSharedPreferences(context.getString(R.string.preference_attributes), Context.MODE_PRIVATE);
+        int draw_color = paintPrefs.getInt(context.getString(R.string.draw_color), Color.BLACK);
+        int draw_width = paintPrefs.getInt(context.getString(R.string.draw_width), 3);
+        int draw_alpha = paintPrefs.getInt(context.getString(R.string.draw_alpha), 255);
+        boolean draw_anti_alias = paintPrefs.getBoolean(context.getString(R.string.draw_anti_alias), true);
+        boolean draw_dither = paintPrefs.getBoolean(context.getString(R.string.draw_dither), true);
+        int draw_paint_style = paintPrefs.getInt(context.getString(R.string.draw_paint_style), 2);
+        int draw_corners = paintPrefs.getInt(context.getString(R.string.draw_corners), 2);
+        int draw_typeface = paintPrefs.getInt(context.getString(R.string.draw_typeface), 0);
+        int draw_fontsize = paintPrefs.getInt(context.getString(R.string.draw_fontsize), 125);
+
         TypedArray typedArray = context.getTheme().obtainStyledAttributes(
                 attrs, R.styleable.DrawView, 0, 0);
         try {
-            mDrawColor = typedArray.getColor(R.styleable.DrawView_dv_draw_color, Color.BLACK);
-            mDrawWidth = typedArray.getInteger(R.styleable.DrawView_dv_draw_width, 3);
-            mDrawAlpha = typedArray.getInteger(R.styleable.DrawView_dv_draw_alpha, 255);
-            mAntiAlias = typedArray.getBoolean(R.styleable.DrawView_dv_draw_anti_alias, true);
-            mDither = typedArray.getBoolean(R.styleable.DrawView_dv_draw_dither, true);
-            int paintStyle = typedArray.getInteger(R.styleable.DrawView_dv_draw_style, 2);
+            mDrawColor = typedArray.getColor(R.styleable.DrawView_dv_draw_color, draw_color);
+            mDrawWidth = typedArray.getInteger(R.styleable.DrawView_dv_draw_width, draw_width);
+            mDrawAlpha = typedArray.getInteger(R.styleable.DrawView_dv_draw_alpha, draw_alpha);
+            mAntiAlias = typedArray.getBoolean(R.styleable.DrawView_dv_draw_anti_alias, draw_anti_alias);
+            mDither = typedArray.getBoolean(R.styleable.DrawView_dv_draw_dither, draw_dither);
+            int paintStyle = typedArray.getInteger(R.styleable.DrawView_dv_draw_style, draw_paint_style);
             if (paintStyle == 0)
                 mPaintStyle = SerializablePaint.Style.FILL;
             else if (paintStyle == 1)
                 mPaintStyle = SerializablePaint.Style.FILL_AND_STROKE;
             else if (paintStyle == 2)
                 mPaintStyle = SerializablePaint.Style.STROKE;
-            int cap = typedArray.getInteger(R.styleable.DrawView_dv_draw_corners, 2);
+            int cap = typedArray.getInteger(R.styleable.DrawView_dv_draw_corners, draw_corners);
             if (cap == 0)
                 mLineCap = SerializablePaint.Cap.BUTT;
             else if (cap == 1)
                 mLineCap = SerializablePaint.Cap.ROUND;
             else if (cap == 2)
                 mLineCap = SerializablePaint.Cap.SQUARE;
-            int typeface = typedArray.getInteger(R.styleable.DrawView_dv_draw_font_family, 0);
+            int typeface = typedArray.getInteger(R.styleable.DrawView_dv_draw_font_family, draw_typeface);
             if (typeface == 0)
                 mFontFamily = Typeface.DEFAULT;
             else if (typeface == 1)
@@ -649,7 +658,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                 mFontFamily = Typeface.SANS_SERIF;
             else if (typeface == 3)
                 mFontFamily = Typeface.SERIF;
-            mFontSize = typedArray.getInteger(R.styleable.DrawView_dv_draw_font_size, 125);
+            mFontSize = typedArray.getInteger(R.styleable.DrawView_dv_draw_font_size, draw_fontsize);
             isForCamera = typedArray.getBoolean(R.styleable.DrawView_dv_draw_is_camera, false);
             int orientation = typedArray.getInteger(R.styleable.DrawView_dv_draw_orientation,
                     getWidth() > getHeight() ? 1 : 0);

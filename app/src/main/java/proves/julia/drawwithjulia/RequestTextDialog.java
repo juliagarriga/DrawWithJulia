@@ -17,7 +17,7 @@ import android.view.inputmethod.InputMethodManager;
  * Created by Ing. Oscar G. Medina Cruz on 09/11/2016.
  */
 
-public class RequestTextDialog extends DialogFragment {
+public class RequestTextDialog extends android.app.DialogFragment {
 
     private static final String REQ_TEXT = "REQ_TEXT";
 
@@ -41,7 +41,7 @@ public class RequestTextDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        View view = LayoutInflater.from(getContext())
+        View view = LayoutInflater.from(getActivity())
                 .inflate(R.layout.layout_request_text, null);
         final TextInputEditText textInputEditText = (TextInputEditText) view.findViewById(R.id.et_req_text);
 
@@ -53,7 +53,7 @@ public class RequestTextDialog extends DialogFragment {
         //InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         //imm.showSoftInput(textInputEditText, InputMethodManager.SHOW_IMPLICIT);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setView(view)
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override

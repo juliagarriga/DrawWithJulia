@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">DrawView</string>
+
+    <!-- DrawView Attributes Preferences -->
+    <string name="preference_attributes">com.reset.carrilet.PREFERENCE_ATTRIBUTES</string>
+
+    <string name="draw_color">com.reset.carrilet.ATTR_COLOR</string>
+    <string name="draw_width">com.reset.carrilet.ATTR_WIDTH</string>
+    <string name="draw_alpha">com.reset.carrilet.ATTR_ALPHA</string>
+    <string name="draw_anti_alias">com.reset.carrilet.ATTR_ANTI_ALIAS</string>
+    <string name="draw_dither">com.reset.carrilet.ATTR_DITHER</string>
+    <string name="draw_paint_style">com.reset.carrilet.ATTR_PAINT_STYLE</string>
+    <string name="draw_corners">com.reset.carrilet.ATTR_CORNERS</string>
+    <string name="draw_typeface">com.reset.carrilet.ATTR_TYPEFACE</string>
+    <string name="draw_fontsize">com.reset.carrilet.ATTR_FONT_SIZE</string>
 </resources>

@@ -19,6 +19,11 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.github.chrisbanes.photoview.PhotoView;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -31,7 +36,7 @@ public class ActivityImage extends Activity {
 
     private MyPagerAdapter adapter;
     private ViewPager myView;
-    private ZoomableImageView imageView;
+    private PhotoView imageView;
     private ArrayList<File> images;
     private LinearLayout deleteButton, editButton;
 
@@ -96,7 +101,7 @@ public class ActivityImage extends Activity {
                 deleteButton = view.findViewById(R.id.deleteButton);
                 editButton = view.findViewById(R.id.editButton);
 
-                BitmapFactory.Options options = new BitmapFactory.Options();
+                /*BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inJustDecodeBounds = true;
 
                 options.inSampleSize = 2;
@@ -104,10 +109,14 @@ public class ActivityImage extends Activity {
                 options.inJustDecodeBounds = false;
 
 
-                Bitmap mBitmap = BitmapFactory.decodeFile(images.get(position).getAbsolutePath(), options);
+                Bitmap mBitmap = BitmapFactory.decodeFile(images.get(position).getAbsolutePath(), options);*/
 
-                if (imageView != null && mBitmap != null)
-                    imageView.setImageBitmap(mBitmap);
+                if (imageView != null)
+                    Glide.with(getApplicationContext())
+                        .load(images.get(position).getAbsolutePath())
+                        .apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
+                                    .skipMemoryCache(true))
+                        .into(imageView);
 
                 editButton.setOnClickListener(new View.OnClickListener() {
                     @Override
