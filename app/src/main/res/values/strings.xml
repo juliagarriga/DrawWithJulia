@@ -6,7 +6,10 @@
 
     <!-- Edit buttons -->
     <string name="save">Save</string>
+    <string name="exit">Exit   </string>
     <string name="apply">Apply</string>
+    <string name="camera">Camera</string>
+    <string name="brightness">Brightness</string>
     <string name="undo">Undo</string>
     <string name="redo">Redo</string>
     <string name="pen">Pen</string>

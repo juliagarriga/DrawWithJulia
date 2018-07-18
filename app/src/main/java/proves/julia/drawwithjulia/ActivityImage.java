@@ -39,6 +39,7 @@ public class ActivityImage extends Activity {
     private PhotoView imageView;
     private ArrayList<File> images;
     private LinearLayout deleteButton, editButton;
+    private static final int REQUEST_EDIT_IMAGE = 2;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,18 +57,21 @@ public class ActivityImage extends Activity {
             position = extras.getInt(Constants.ID);
         }
         String path = Utilitats.getWorkFolder(this, Utilitats.IMAGES).getPath();
-        File files[] = new File(path).listFiles();
+        File filepath = new File(path);
 
+        // List of images to show in the gallery
         images = new ArrayList();
+
+        File[] files = ActivityGallery.sortArray(filepath);
 
         if (files != null) {
             for (File file : files) {
                 if (file.length() != 0L)
                     if (file.getName().contains("PIC") || file.getName().contains("DRW"))
                         images.add(file);
-                /*if (file.getName().contains("PIC")) {
+                    /*if (file.getName().contains("PIC")) {
                     images.add(file);
-                }*/
+                    }*/
             }
         }
 
@@ -75,6 +79,18 @@ public class ActivityImage extends Activity {
         myView = findViewById(R.id.viewPager);
         myView.setAdapter(adapter);
         myView.setCurrentItem(position);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == REQUEST_EDIT_IMAGE) {
+            Intent intent = new Intent();
+            setResult(resultCode, intent);
+            finish();
+        }
+
 
     }
 
@@ -121,9 +137,9 @@ public class ActivityImage extends Activity {
                 editButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(ActivityImage.this, MainActivity.class);
+                        Intent intent = new Intent(ActivityImage.this, EditImageActivity.class);
                         intent.putExtra("image", images.get(position).getAbsolutePath());
-                        startActivity(intent);
+                        startActivityForResult(intent, REQUEST_EDIT_IMAGE);
                     }
                 });
 

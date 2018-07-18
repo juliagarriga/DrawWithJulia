@@ -1,29 +1,31 @@
 package proves.julia.drawwithjulia;
 
 import android.animation.LayoutTransition;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -31,8 +33,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.byox.drawview.enums.BackgroundScale;
-import com.byox.drawview.enums.BackgroundType;
 import com.byox.drawview.enums.DrawingCapture;
 import com.byox.drawview.enums.DrawingMode;
 import com.byox.drawview.enums.DrawingTool;
@@ -41,10 +41,7 @@ import com.byox.drawview.views.DrawView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import static android.graphics.Paint.Cap.BUTT;
-import static android.graphics.Paint.Cap.ROUND;
-import static android.graphics.Paint.Cap.SQUARE;
+import java.util.Random;
 
 /**
  * Created by julia on 2/14/18.
@@ -54,18 +51,23 @@ public class EditImageActivity extends AppCompatActivity {
 
     private DrawView myDrawView;
     private FrameLayout parentLayout;
+    private Button cancelEditButton, acceptEditButton;
     private LinearLayout pencilButton, undoButton, redoButton, eraseButton, textButton,
             figuresButton, rightLayout, lineButton, arrowButton, rectangleButton,
-            circleButton, ellipseButton, drawAttrButton, moveButton, curveButton, applyButton;
-    private ImageView undoImage, redoImage, applyImage, penImage, eraseImage, moveImage,
-            textImage, drawAttrImage, figuresImage, backgroundImage;
-    private TextView undoText, redoText, applyText, penText, eraseText, moveText, textText,
-            drawAttrText, figuresText;
+            circleButton, ellipseButton, drawAttrButton, moveButton, brightnessButton,
+            saveButton, editLayout, buttonsLayout, seekBarButtonsLayout, exitButton;
+    private ImageView undoImage, redoImage, penImage, eraseImage, moveImage,
+            textImage, drawAttrImage, figuresImage, backgroundImage, brightnessImage, saveImage;
+    private TextView undoText, redoText, penText, eraseText, moveText, textText,
+            drawAttrText, figuresText, brightnessText, saveText;
+    private SeekBar seekBar;
     private Bitmap bitmap;
     private String filepath;
     private OutputMediaFile outputMediaFile;
     private ImageView selectedImage;
     private TextView selectedText;
+    private int brightnessProgress, savedBrightness, tempBrightnessProgress;
+    private boolean brighten = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,33 +82,18 @@ public class EditImageActivity extends AppCompatActivity {
 
         try {
 
-            final String path = getIntent().getStringExtra("path");
-            final String drawPath = getIntent().getStringExtra("drawPath");
-
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-
-            //Set phone metrics
-            DisplayMetrics displaymetrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-
-            options.inSampleSize = 2;
-            options.inJustDecodeBounds = false;
+            filepath = getIntent().getStringExtra("image");
             //bitmap = BitmapFactory.decodeFile(path, options);
 
-            int brightness = getIntent().getIntExtra("brightness", 100);
+            if (filepath != null)
+                myDrawView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
 
-            if (brightness != 100)
-                bitmap = MainActivity.applyLightness(bitmap, brightness);
-
-            myDrawView.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-
-                        Glide.with(EditImageActivity.this)
+                            Glide.with(EditImageActivity.this)
                                 .asBitmap()
-                                .load(path)
+                                .load(filepath)
                                 .apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
                                         .skipMemoryCache(true))
                                 .into(new SimpleTarget<Bitmap>() {
@@ -114,31 +101,33 @@ public class EditImageActivity extends AppCompatActivity {
                                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                                         bitmap = resource;
                                         backgroundImage.setImageBitmap(bitmap);
+                                        brighten = true;
+
+                                        brightnessImage.setColorFilter(getResources().getColor(android.R.color.black));
+                                        brightnessText.setTextColor(getResources().getColor(android.R.color.black));
                                     }
                                 });
 
-                        /*if (bitmap != null) {
+                            /*if (bitmap != null) {
 
-                            undoImage.setColorFilter(getResources().getColor(R.color.buttons_tint3));
-                            redoImage.setColorFilter(getResources().getColor(R.color.buttons_tint3));
-                            applyImage.setColorFilter(getResources().getColor(R.color.buttons_tint3));
+                                undoImage.setColorFilter(getResources().getColor(R.color.buttons_tint3));
+                                redoImage.setColorFilter(getResources().getColor(R.color.buttons_tint3));
+                                applyImage.setColorFilter(getResources().getColor(R.color.buttons_tint3));
 
-                            undoText.setTextColor(getResources().getColor(R.color.buttons_tint3));
-                            redoText.setTextColor(getResources().getColor(R.color.buttons_tint3));
-                            applyText.setTextColor(getResources().getColor(R.color.buttons_tint3));
-                        }*/
+                                undoText.setTextColor(getResources().getColor(R.color.buttons_tint3));
+                                redoText.setTextColor(getResources().getColor(R.color.buttons_tint3));
+                                applyText.setTextColor(getResources().getColor(R.color.buttons_tint3));
+                            }*/
 
-                        if (drawPath != null)
-                            myDrawView.setBackgroundImage(BitmapFactory.decodeFile(drawPath), BackgroundType.BITMAP, BackgroundScale.CENTER_CROP);
-                        myDrawView.setBackgroundColor(Color.TRANSPARENT);
-
-                    } catch (NullPointerException e) {
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        } catch (NullPointerException e) {
+                            brightnessButton.setVisibility(View.GONE);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-            });
+                });
+
+            myDrawView.setBackgroundColor(Color.TRANSPARENT);
 
 
         } catch (NullPointerException e) {
@@ -151,6 +140,9 @@ public class EditImageActivity extends AppCompatActivity {
     private void setLayouts() {
 
         myDrawView = (DrawView) findViewById(R.id.draw_view);
+
+        cancelEditButton = (Button) findViewById(R.id.cancelEditButton);
+        acceptEditButton = (Button) findViewById(R.id.acceptEditButton);
 
         parentLayout = (FrameLayout) findViewById(R.id.parentLayout);
         rightLayout = (LinearLayout) findViewById(R.id.rightLayout);
@@ -165,13 +157,16 @@ public class EditImageActivity extends AppCompatActivity {
         lineButton = (LinearLayout) findViewById(R.id.lineButton);
         arrowButton = (LinearLayout) findViewById(R.id.arrowButton);
         rectangleButton = (LinearLayout) findViewById(R.id.rectangleButton);
-        circleButton = (LinearLayout) findViewById(R.id.circleButton);
-        ellipseButton = (LinearLayout) findViewById(R.id.ellipseButton);
-        applyButton = findViewById(R.id.applyButton);
+        circleButton = findViewById(R.id.circleButton);
+        ellipseButton = findViewById(R.id.ellipseButton);
+        saveButton = findViewById(R.id.saveButton);
+        brightnessButton = findViewById(R.id.brightnessButton);
+        exitButton = findViewById(R.id.exitButton);
 
         undoImage = findViewById(R.id.undo_icon);
         redoImage = findViewById(R.id.redo_icon);
-        applyImage = findViewById(R.id.apply_icon);
+        brightnessImage = findViewById(R.id.brightness_icon);
+        saveImage = findViewById(R.id.save_icon);
         penImage = findViewById(R.id.pen_icon);
         eraseImage = findViewById(R.id.erase_icon);
         moveImage = findViewById(R.id.move_icon);
@@ -180,12 +175,19 @@ public class EditImageActivity extends AppCompatActivity {
 
         undoText = findViewById(R.id.undo_text);
         redoText = findViewById(R.id.redo_text);
-        applyText = findViewById(R.id.apply_text);
+        saveText = findViewById(R.id.save_text);
+        brightnessText = findViewById(R.id.brightness_text);
         penText = findViewById(R.id.pen_text);
         eraseText = findViewById(R.id.erase_text);
         moveText = findViewById(R.id.move_text);
         textText = findViewById(R.id.text_text);
         figuresText = findViewById(R.id.figures_text);
+
+        seekBar = findViewById(R.id.seekBar);
+
+        editLayout = findViewById(R.id.editLayout);
+        seekBarButtonsLayout = findViewById(R.id.seekBarButtonsLayout);
+        buttonsLayout = findViewById(R.id.buttonsLayout);
 
         backgroundImage = findViewById(R.id.backgroundImage);
 
@@ -244,9 +246,10 @@ public class EditImageActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // For make Undo action
-                if (myDrawView.canUndo())
+                if (myDrawView.canUndo()) {
                     myDrawView.undo();
-
+                    canUndoRedoSave();
+                }
             }
         });
 
@@ -254,15 +257,47 @@ public class EditImageActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // For make Redo action
-                if (myDrawView.canRedo())
+                if (myDrawView.canRedo()) {
                     myDrawView.redo();
+                    canUndoRedoSave();
+                }
             }
         });
 
-        applyButton.setOnClickListener(new View.OnClickListener() {
+        brightnessButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (brighten) {
+                    seekBar.setProgress(brightnessProgress);
+                    invertEditLayout();
+                    toggleVisibilities(true);
+                }
+            }
+        });
+
+        cancelEditButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                saveDraw();
+                backgroundImage.setImageBitmap(applyLightness(bitmap, brightnessProgress));
+                invertEditLayout();
+                toggleVisibilities(true);
+            }
+        });
+
+        acceptEditButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                brightnessProgress = tempBrightnessProgress;
+                invertEditLayout();
+                toggleVisibilities(true);
+                canUndoRedoSave();
+            }
+        });
+
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                saveDraw(false);
             }
         });
 
@@ -374,28 +409,115 @@ public class EditImageActivity extends AppCompatActivity {
                 figuresText.setText(getResources().getString(R.string.ellipse));
             }
         });
+
+        exitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                exit();
+            }
+        });
+
+        seekBar.setMax(200);
+        brightnessProgress = 100;
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                tempBrightnessProgress = i;
+                backgroundImage.setImageBitmap(applyLightness(bitmap, i));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                tempBrightnessProgress = brightnessProgress;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 
-    private void saveDraw() {
+
+
+    private void saveFile(String filepath, Bitmap bitmap) {
+
         try {
-            Object[] createCaptureResponse = myDrawView.createCapture(DrawingCapture.BITMAP);
-            Bitmap drawBitmap;
-            File file;
 
-            drawBitmap = (Bitmap) createCaptureResponse[0];
-
-            file = outputMediaFile.getOutputMediaFile("MOVE", true);
-
+            File file = new File(filepath);
             file.createNewFile();
-            filepath = file.getAbsolutePath();
             FileOutputStream outputStream = new FileOutputStream(file);
-            drawBitmap.compress(Bitmap.CompressFormat.PNG, 20, outputStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream);
             myDrawView.save();
+            savedBrightness = brightnessProgress;
 
         } catch (IOException e) {
             e.printStackTrace();
-            // TODO: ADD TO LOG
         }
+    }
+
+
+    private void saveDraw(final boolean finish) {
+
+        final File file;
+        if (filepath == null)
+            file = outputMediaFile.getOutputMediaFile("DRW", true);
+        else
+            file = outputMediaFile.getOutputMediaFile(filepath, false);
+
+        filepath = file.getAbsolutePath();
+
+        Object[] createCaptureResponse = myDrawView.createCapture(DrawingCapture.BITMAP);
+
+        final Bitmap drawBitmap;
+        drawBitmap = (Bitmap) createCaptureResponse[0];
+        if (bitmap == null) {
+            bitmap = Bitmap.createBitmap(drawBitmap.getWidth(), drawBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            canvas.drawColor(Color.WHITE);
+        }
+
+        DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        saveFile(filepath, overlay(bitmap, drawBitmap));
+                        if (finish)
+                            finish();
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+
+                        final String[] filename = file.getName().split("\\.");
+                        Random random = new Random();
+
+                        saveFile(filepath.replace(filename[0], filename[0] + String.valueOf(random.nextInt(100))), drawBitmap);
+                        if (finish)
+                            finish();
+                        break;
+                }
+            }
+        };
+
+        if (file.exists()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(getResources().getString(R.string.save_image)).setPositiveButton(getResources().getString(R.string.replace_image),
+                    clickListener)
+                    .setNegativeButton(getResources().getString(R.string.new_image), clickListener).show();
+        } else {
+            saveFile(filepath, overlay(bitmap, drawBitmap));
+            if (finish)
+                finish();
+        }
+    }
+
+    private static Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
+        Bitmap bmOverlay = Bitmap.createBitmap(bmp2.getWidth(), bmp2.getHeight(), bmp1.getConfig());
+        Canvas canvas = new Canvas(bmOverlay);
+        canvas.drawBitmap(Bitmap.createScaledBitmap(bmp1, bmp2.getWidth(), bmp2.getHeight(), false), new Matrix(), null);
+        canvas.drawBitmap(bmp2, 0, 0, null);
+        return bmOverlay;
     }
 
     private void invertRightLayout() {
@@ -405,6 +527,39 @@ public class EditImageActivity extends AppCompatActivity {
         params.height = params.height == 0 ? ViewGroup.LayoutParams.MATCH_PARENT : 0;
 
         rightLayout.setLayoutParams(params);
+    }
+
+    public static Bitmap applyLightness(Bitmap bmp, int progress) {
+
+        PorterDuffColorFilter porterDuffColorFilter;
+
+        if (progress > 100) {
+            int value = (progress - 100) * 255 / 100;
+            porterDuffColorFilter = new PorterDuffColorFilter(Color.argb(value, 255, 255, 255), PorterDuff.Mode.SRC_OVER);
+        } else {
+            int value = (100 - progress) * 255 / 100;
+            porterDuffColorFilter = new PorterDuffColorFilter(Color.argb(value, 0, 0, 0), PorterDuff.Mode.SRC_ATOP);
+        }
+
+        Bitmap ret = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), bmp.getConfig());
+
+        Canvas canvas = new Canvas(ret);
+
+        Paint paint = new Paint();
+        paint.setColorFilter(porterDuffColorFilter);
+        canvas.drawBitmap(bmp, 0, 0, paint);
+
+        return ret;
+
+    }
+
+    private void invertEditLayout() {
+
+        ViewGroup.LayoutParams params = editLayout.getLayoutParams();
+
+        params.height = params.height == 0 ? ViewGroup.LayoutParams.WRAP_CONTENT : 0;
+
+        editLayout.setLayoutParams(params);
     }
 
     private void changeDrawAttribs() {
@@ -494,7 +649,7 @@ public class EditImageActivity extends AppCompatActivity {
 
             @Override
             public void onEndDrawing() {
-
+                canUndoRedoSave();
             }
 
             @Override
@@ -527,24 +682,65 @@ public class EditImageActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public void onBackPressed() {
+    private void canUndoRedoSave() {
+
+        if (myDrawView.canUndo()) {
+            undoImage.setColorFilter(getResources().getColor(android.R.color.black));
+            undoText.setTextColor(getResources().getColor(android.R.color.black));
+        } else {
+            undoImage.setColorFilter(getResources().getColor(android.R.color.darker_gray));
+            undoText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        }
+
+        if (myDrawView.canRedo()) {
+            redoImage.setColorFilter(getResources().getColor(android.R.color.black));
+            redoText.setTextColor(getResources().getColor(android.R.color.black));
+        } else {
+            redoImage.setColorFilter(getResources().getColor(android.R.color.darker_gray));
+            redoText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        }
+        if (((!myDrawView.isSaved() && myDrawView.isDrawn()) || brightnessProgress != savedBrightness)) {
+            saveImage.setColorFilter(getResources().getColor(android.R.color.black));
+            saveText.setTextColor(getResources().getColor(android.R.color.black));
+        } else {
+            saveImage.setColorFilter(getResources().getColor(android.R.color.darker_gray));
+            saveText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+        }
+    }
+
+    private boolean toggleVisibilities(boolean toToggle) {
+
+        if (seekBarButtonsLayout.getVisibility() == View.VISIBLE) {
+
+            seekBarButtonsLayout.setVisibility(View.GONE);
+            buttonsLayout.setVisibility(View.VISIBLE);
+
+            return false;
+
+        } else if (toToggle) {
+
+            seekBarButtonsLayout.setVisibility(View.VISIBLE);
+            buttonsLayout.setVisibility(View.GONE);
+
+        }
+
+        return true;
+    }
+
+    private void exit() {
         final Intent intent = new Intent();
 
-        if (!myDrawView.isSaved() && myDrawView.isDrawn()) {
+        if (!myDrawView.isSaved() && (myDrawView.isDrawn() || brightnessProgress != 100)) {
             DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     switch (which) {
                         case DialogInterface.BUTTON_POSITIVE:
-                            saveDraw();
+                            saveDraw(true);
                             setResult(RESULT_OK, intent);
-                            intent.putExtra("filepath", filepath);
-                            finish();
                             break;
                         case DialogInterface.BUTTON_NEGATIVE:
                             setResult(RESULT_CANCELED, intent);
-                            intent.putExtra("filepath", filepath);
                             finish();
                             break;
                     }
@@ -558,12 +754,15 @@ public class EditImageActivity extends AppCompatActivity {
 
         } else if (myDrawView.isSaved()) {
             setResult(RESULT_OK, intent);
-            intent.putExtra("filepath", filepath);
             finish();
         } else {
             setResult(RESULT_CANCELED, intent);
-            intent.putExtra("filepath", filepath);
             finish();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        exit();
     }
 }

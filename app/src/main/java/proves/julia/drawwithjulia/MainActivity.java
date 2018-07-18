@@ -161,7 +161,6 @@ public class MainActivity extends Activity {
                 intent.putExtra("drawPath", drawPath);
                 intent.putExtra("brightness", brightnessProgress);
                 startActivityForResult(intent, REQUEST_EDIT_IMAGE);
-
             }
         });
 

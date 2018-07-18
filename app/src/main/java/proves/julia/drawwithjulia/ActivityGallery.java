@@ -10,11 +10,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Display;
@@ -24,19 +29,34 @@ import android.view.WindowManager;
 import android.widget.GridView;
 import android.widget.ImageButton;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class ActivityGallery extends Activity {
 
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_EDIT_IMAGE = 2;
 
     private static ImageButton delButton;
     private static GalleryAdapter adapter;
     private static ArrayList<MyImage> images;
-    private ImageButton addButton;
+    private ImageButton cameraButton, sheetButton;
     private RecyclerView recyclerView;
+    private Uri uri;
 
     private OutputMediaFile outputMediaFile;
 
@@ -73,24 +93,27 @@ public class ActivityGallery extends Activity {
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
-        addButton = findViewById(R.id.add_image_button);
+        cameraButton = findViewById(R.id.take_image_button);
+
+        sheetButton = findViewById(R.id.empty_image);
 
         delButton = findViewById(R.id.delete_image_button);
 
         String path = Utilitats.getWorkFolder(this, Utilitats.IMAGES).getPath();
-        File files[] = new File(path).listFiles();
+        File filepath = new File(path);
 
         // List of images to show in the gallery
         images = new ArrayList();
+
+        File[] files = sortArray(filepath);
 
         if (files != null) {
             for (File file : files) {
                 if (file.length() != 0L)
                     if (file.getName().contains("PIC") || file.getName().contains("DRW"))
                         images.add(new MyImage(file));
-                /*if (file.getName().contains("PIC")) {
-                    images.add(new MyImage(file));
-                }*/
+                    else if (file.getName().contains("MOVE"))
+                        file.delete();
             }
         }
 
@@ -108,14 +131,34 @@ public class ActivityGallery extends Activity {
 
     }
 
+    public static File[] sortArray(File path) {
+        File[] toSort = path.listFiles();
+
+        Arrays.sort(toSort, new Comparator<File>(){
+            public int compare(File f1, File f2) {
+                return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
+            }
+        });
+
+        return toSort;
+    }
+
     private void setButtons() {
-        addButton.setOnClickListener(new View.OnClickListener() {
+
+        cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                Intent intent = new Intent(ActivityGallery.this, MainActivity.class);
+                startCamera();
+            }
+        });
 
-                startActivity(intent);
+        sheetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ActivityGallery.this, EditImageActivity.class);
+
+                startActivityForResult(intent, REQUEST_EDIT_IMAGE);
             }
         });
 
@@ -164,7 +207,8 @@ public class ActivityGallery extends Activity {
      * The images list is cleared and refilled with the new changes
      */
     public static void dataChanged(String path) {
-        File files[] = new File(path).listFiles();
+        File filepath = new File(path);
+        File[] files = sortArray(filepath);
         images.clear();
 
         if (files != null) {
@@ -179,5 +223,36 @@ public class ActivityGallery extends Activity {
 
         adapter.notifyDataSetChanged();
     }
+
+    private void startCamera() {
+
+        // create Intent to take a picture and return control to the calling application
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        uri = outputMediaFile.getOutputMediaFileUri("PIC");
+
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            String path = Utilitats.getWorkFolder(this, Utilitats.IMAGES).getPath();
+            dataChanged(path);
+        }
+
+        else if (requestCode == REQUEST_EDIT_IMAGE && resultCode == RESULT_OK) {
+            String path = Utilitats.getWorkFolder(this, Utilitats.IMAGES).getPath();
+            dataChanged(path);
+        }
+
+
+    }
+
 
 }

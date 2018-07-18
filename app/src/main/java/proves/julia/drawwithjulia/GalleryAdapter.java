@@ -29,6 +29,7 @@ import java.util.ArrayList;
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
     private final Activity mContext;
     private ArrayList<MyImage> images;
+    private static final int REQUEST_EDIT_IMAGE = 2;
 
     /**
      * Adapter used to show a list of images
@@ -127,7 +128,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                     // Activity that shows each image in bigger dimensions (occupying all the screen).
                     Intent intent = new Intent(mContext, ActivityImage.class);
                     intent.putExtra(Constants.ID, position);
-                    mContext.startActivity(intent);
+                    mContext.startActivityForResult(intent, REQUEST_EDIT_IMAGE);
 
                 }
             }
