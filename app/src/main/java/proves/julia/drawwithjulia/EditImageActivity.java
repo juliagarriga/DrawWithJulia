@@ -305,7 +305,7 @@ public class EditImageActivity extends AppCompatActivity {
                             brightnessImage.setColorFilter(getResources().getColor(android.R.color.black));
                             brightnessText.setTextColor(getResources().getColor(android.R.color.black));
                             seekBar.setProgress(brightnessProgress);
-                            invertEditLayout();
+                            //invertEditLayout();
                             toggleVisibilities(true);
                         }
                         return true; // if you want to handle the touch event
@@ -318,7 +318,7 @@ public class EditImageActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 backgroundImage.setImageBitmap(applyLightness(bitmap, brightnessProgress));
-                invertEditLayout();
+                //invertEditLayout();
                 toggleVisibilities(true);
             }
         });
@@ -327,7 +327,7 @@ public class EditImageActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 brightnessProgress = tempBrightnessProgress;
-                invertEditLayout();
+                //invertEditLayout();
                 toggleVisibilities(true);
                 canUndoRedoSave();
             }
@@ -511,7 +511,7 @@ public class EditImageActivity extends AppCompatActivity {
             File file = new File(filepath);
             file.createNewFile();
             FileOutputStream outputStream = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream);
+            applyLightness(bitmap, brightnessProgress).compress(Bitmap.CompressFormat.JPEG, 20, outputStream);
             myDrawView.save();
             savedBrightness = brightnessProgress;
 
@@ -797,7 +797,7 @@ public class EditImageActivity extends AppCompatActivity {
     private void exit() {
         final Intent intent = new Intent();
 
-        if (!myDrawView.isSaved() && (myDrawView.isDrawn() || brightnessProgress != 100)) {
+        if (!myDrawView.isSaved() && (myDrawView.isDrawn() && myDrawView.canUndo()|| brightnessProgress != 100)) {
             DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

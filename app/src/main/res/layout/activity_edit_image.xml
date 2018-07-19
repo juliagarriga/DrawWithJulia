@@ -360,44 +360,52 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:id="@+id/seekBarButtonsLayout"
                 android:visibility="gone">
 
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_weight="0.5"
-                    android:layout_height="match_parent"
-                    android:id="@+id/cancelEditButton"
-                    android:background="@android:color/transparent"
-                    android:text="CANCEL"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.6"
+                    android:paddingTop="5dp"
+                    android:orientation="horizontal">
 
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_weight="0.5"
-                    android:id="@+id/acceptEditButton"
-                    android:background="@android:color/transparent"
-                    android:layout_height="match_parent"
-                    android:text="ACCEPT"/>
+                    <Button
+                        android:layout_width="0dp"
+                        android:layout_weight="0.5"
+                        android:layout_height="match_parent"
+                        android:id="@+id/cancelEditButton"
+                        android:background="@android:color/transparent"
+                        android:text="CANCEL"/>
+
+                    <Button
+                        android:layout_width="0dp"
+                        android:layout_weight="0.5"
+                        android:id="@+id/acceptEditButton"
+                        android:background="@android:color/transparent"
+                        android:layout_height="match_parent"
+                        android:text="ACCEPT"/>
 
 
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.4"
+                    android:id="@+id/editLayout"
+                    android:orientation="vertical"
+                    android:padding="5dp"
+                    android:background="@drawable/black_line_top">
+
+                    <android.support.v7.widget.AppCompatSeekBar
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/seekBar"/>
+
+                </LinearLayout>
             </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:id="@+id/editLayout"
-            android:orientation="vertical"
-            android:padding="10dp"
-            android:background="@drawable/black_line_top">
-
-            <android.support.v7.widget.AppCompatSeekBar
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/seekBar"/>
-
         </LinearLayout>
 
     </LinearLayout>
