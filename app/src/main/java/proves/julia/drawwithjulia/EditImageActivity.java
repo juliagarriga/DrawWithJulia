@@ -1,6 +1,7 @@
 package proves.julia.drawwithjulia;
 
 import android.animation.LayoutTransition;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,6 +20,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -56,10 +58,10 @@ public class EditImageActivity extends AppCompatActivity {
             figuresButton, rightLayout, lineButton, arrowButton, rectangleButton,
             circleButton, ellipseButton, drawAttrButton, moveButton, brightnessButton,
             saveButton, editLayout, buttonsLayout, seekBarButtonsLayout, exitButton;
-    private ImageView undoImage, redoImage, penImage, eraseImage, moveImage,
+    private ImageView undoImage, redoImage, penImage, eraseImage, moveImage, exitImage,
             textImage, drawAttrImage, figuresImage, backgroundImage, brightnessImage, saveImage;
     private TextView undoText, redoText, penText, eraseText, moveText, textText,
-            drawAttrText, figuresText, brightnessText, saveText;
+            drawAttrText, figuresText, brightnessText, saveText, exitText;
     private SeekBar seekBar;
     private Bitmap bitmap;
     private String filepath;
@@ -68,6 +70,8 @@ public class EditImageActivity extends AppCompatActivity {
     private TextView selectedText;
     private int brightnessProgress, savedBrightness, tempBrightnessProgress;
     private boolean brighten = false;
+    private boolean newDraw = true;
+    private boolean save = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -137,6 +141,7 @@ public class EditImageActivity extends AppCompatActivity {
 
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void setLayouts() {
 
         myDrawView = (DrawView) findViewById(R.id.draw_view);
@@ -172,6 +177,7 @@ public class EditImageActivity extends AppCompatActivity {
         moveImage = findViewById(R.id.move_icon);
         textImage = findViewById(R.id.text_icon);
         figuresImage = findViewById(R.id.figures_icon);
+        exitImage = findViewById(R.id.exit_icon);
 
         undoText = findViewById(R.id.undo_text);
         redoText = findViewById(R.id.redo_text);
@@ -182,6 +188,7 @@ public class EditImageActivity extends AppCompatActivity {
         moveText = findViewById(R.id.move_text);
         textText = findViewById(R.id.text_text);
         figuresText = findViewById(R.id.figures_text);
+        exitText = findViewById(R.id.exit_text);
 
         seekBar = findViewById(R.id.seekBar);
 
@@ -242,36 +249,68 @@ public class EditImageActivity extends AppCompatActivity {
             }
         });
 
-        undoButton.setOnClickListener(new View.OnClickListener() {
+        undoButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
-                // For make Undo action
-                if (myDrawView.canUndo()) {
-                    myDrawView.undo();
-                    canUndoRedoSave();
+            public boolean onTouch(View v, MotionEvent event) {
+                switch(event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        undoImage.setColorFilter(getResources().getColor(android.R.color.darker_gray));
+                        undoText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+                        return true; // if you want to handle the touch event
+                    case MotionEvent.ACTION_UP:
+                        if (myDrawView.canUndo()) {
+                            undoImage.setColorFilter(getResources().getColor(android.R.color.black));
+                            undoText.setTextColor(getResources().getColor(android.R.color.black));
+                            myDrawView.undo();
+                            canUndoRedoSave();
+                        }
+                        return true; // if you want to handle the touch event
                 }
+                return false;
             }
         });
 
-        redoButton.setOnClickListener(new View.OnClickListener() {
+        redoButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
-                // For make Redo action
-                if (myDrawView.canRedo()) {
-                    myDrawView.redo();
-                    canUndoRedoSave();
+            public boolean onTouch(View v, MotionEvent event) {
+                switch(event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        redoImage.setColorFilter(getResources().getColor(android.R.color.darker_gray));
+                        redoText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+                        return true; // if you want to handle the touch event
+                    case MotionEvent.ACTION_UP:
+                        if (myDrawView.canRedo()) {
+                            redoImage.setColorFilter(getResources().getColor(android.R.color.black));
+                            redoText.setTextColor(getResources().getColor(android.R.color.black));
+                            myDrawView.redo();
+                            canUndoRedoSave();
+                        }
+                        return true; // if you want to handle the touch event
                 }
+                return false;
             }
         });
 
-        brightnessButton.setOnClickListener(new View.OnClickListener() {
+
+        brightnessButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                if (brighten) {
-                    seekBar.setProgress(brightnessProgress);
-                    invertEditLayout();
-                    toggleVisibilities(true);
+            public boolean onTouch(View v, MotionEvent event) {
+                switch(event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        brightnessImage.setColorFilter(getResources().getColor(android.R.color.darker_gray));
+                        brightnessText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+                        return true; // if you want to handle the touch event
+                    case MotionEvent.ACTION_UP:
+                        if (brighten) {
+                            brightnessImage.setColorFilter(getResources().getColor(android.R.color.black));
+                            brightnessText.setTextColor(getResources().getColor(android.R.color.black));
+                            seekBar.setProgress(brightnessProgress);
+                            invertEditLayout();
+                            toggleVisibilities(true);
+                        }
+                        return true; // if you want to handle the touch event
                 }
+                return false;
             }
         });
 
@@ -294,10 +333,23 @@ public class EditImageActivity extends AppCompatActivity {
             }
         });
 
-        saveButton.setOnClickListener(new View.OnClickListener() {
+        saveButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
-                saveDraw(false);
+            public boolean onTouch(View v, MotionEvent event) {
+                switch(event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        saveImage.setColorFilter(getResources().getColor(android.R.color.darker_gray));
+                        saveText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+                        return true; // if you want to handle the touch event
+                    case MotionEvent.ACTION_UP:
+                        if (save) {
+                            saveImage.setColorFilter(getResources().getColor(android.R.color.black));
+                            saveText.setTextColor(getResources().getColor(android.R.color.black));
+                            saveDraw(false);
+                        }
+                        return true; // if you want to handle the touch event
+                }
+                return false;
             }
         });
 
@@ -410,15 +462,26 @@ public class EditImageActivity extends AppCompatActivity {
             }
         });
 
-        exitButton.setOnClickListener(new View.OnClickListener() {
+        exitButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                exit();
+            public boolean onTouch(View v, MotionEvent event) {
+                switch(event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        exitImage.setColorFilter(getResources().getColor(android.R.color.darker_gray));
+                        exitText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+                        return true; // if you want to handle the touch event
+                    case MotionEvent.ACTION_UP:
+                        exitImage.setColorFilter(getResources().getColor(android.R.color.black));
+                        exitText.setTextColor(getResources().getColor(android.R.color.black));
+                        exit();
+                        return true; // if you want to handle the touch event
+                }
+                return false;
             }
         });
 
         seekBar.setMax(200);
-        brightnessProgress = 100;
+        brightnessProgress = savedBrightness = 100;
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -500,12 +563,14 @@ public class EditImageActivity extends AppCompatActivity {
             }
         };
 
-        if (file.exists()) {
+        if (file.exists() && newDraw) {
+            newDraw = false;
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(getResources().getString(R.string.save_image)).setPositiveButton(getResources().getString(R.string.replace_image),
                     clickListener)
                     .setNegativeButton(getResources().getString(R.string.new_image), clickListener).show();
         } else {
+            newDraw = false;
             saveFile(filepath, overlay(bitmap, drawBitmap));
             if (finish)
                 finish();
@@ -699,12 +764,14 @@ public class EditImageActivity extends AppCompatActivity {
             redoImage.setColorFilter(getResources().getColor(android.R.color.darker_gray));
             redoText.setTextColor(getResources().getColor(android.R.color.darker_gray));
         }
-        if (((!myDrawView.isSaved() && myDrawView.isDrawn()) || brightnessProgress != savedBrightness)) {
+        if (((!myDrawView.isSaved() && myDrawView.isDrawn() && myDrawView.canUndo()) || brightnessProgress != savedBrightness)) {
             saveImage.setColorFilter(getResources().getColor(android.R.color.black));
             saveText.setTextColor(getResources().getColor(android.R.color.black));
+            save = true;
         } else {
             saveImage.setColorFilter(getResources().getColor(android.R.color.darker_gray));
             saveText.setTextColor(getResources().getColor(android.R.color.darker_gray));
+            save = false;
         }
     }
 
@@ -736,8 +803,8 @@ public class EditImageActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int which) {
                     switch (which) {
                         case DialogInterface.BUTTON_POSITIVE:
-                            saveDraw(true);
                             setResult(RESULT_OK, intent);
+                            saveDraw(true);
                             break;
                         case DialogInterface.BUTTON_NEGATIVE:
                             setResult(RESULT_CANCELED, intent);

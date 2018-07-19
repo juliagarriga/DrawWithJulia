@@ -396,7 +396,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                 case MotionEvent.ACTION_UP:
                     lastMoveIndex = mDrawMoveHistory.size() - 1;
 
-                    if (mLastTouchEvent == MotionEvent.ACTION_DOWN) {
+                    if (mLastTouchEvent == MotionEvent.ACTION_DOWN && mDrawingMode != DrawingMode.TEXT) {
                         if (mDrawMoveHistory.size() > 0) {
                             mDrawMoveHistory.remove(lastMoveIndex);
                             mDrawMoveHistoryIndex--;
@@ -1608,6 +1608,9 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                     case TEXT:
 
                         Rect rect = new Rect();
+
+                        if (drawMove.getTemp() == null)
+                            break;
 
                         drawMove.getPaint().getTextBounds(drawMove.getText(), 0, drawMove.getText().length(), rect);
 

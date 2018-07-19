@@ -11,6 +11,7 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 /**
@@ -49,11 +50,12 @@ public class RequestTextDialog extends android.app.DialogFragment {
             textInputEditText.setText(getArguments().getShort(REQ_TEXT));
 
         textInputEditText.requestFocus();
+
         // Used to automatically open the keyboard
         //InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         //imm.showSoftInput(textInputEditText, InputMethodManager.SHOW_IMPLICIT);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setView(view)
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
@@ -72,7 +74,12 @@ public class RequestTextDialog extends android.app.DialogFragment {
                     }
                 });
 
-        return builder.create();
+
+        final AlertDialog dialog = builder.create();
+
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+
+        return dialog;
     }
 
     // METHODS
