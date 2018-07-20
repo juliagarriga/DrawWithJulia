@@ -13,4 +13,5 @@
     <string name="draw_corners">com.reset.carrilet.ATTR_CORNERS</string>
     <string name="draw_typeface">com.reset.carrilet.ATTR_TYPEFACE</string>
     <string name="draw_fontsize">com.reset.carrilet.ATTR_FONT_SIZE</string>
+
 </resources>

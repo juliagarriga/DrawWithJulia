@@ -36,13 +36,30 @@
             android:gravity="center_horizontal">
 
             <ImageButton
-                android:id="@+id/add_image_button"
+                android:id="@+id/take_image_button"
                 android:layout_width="38dp"
                 android:layout_height="38dp"
                 android:adjustViewBounds="true"
                 android:background="@android:color/transparent"
                 android:scaleType="fitCenter"
-                android:src="@drawable/add_image" />
+                android:src="@drawable/camera" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right">
+
+            <ImageButton
+                android:id="@+id/empty_image"
+                android:layout_width="38dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                android:adjustViewBounds="true"
+                android:background="@android:color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/empty_sheet" />
+
         </LinearLayout>
 
         <LinearLayout

@@ -55,7 +55,7 @@ public class EditImageActivity extends AppCompatActivity {
     private FrameLayout parentLayout;
     private Button cancelEditButton, acceptEditButton;
     private LinearLayout pencilButton, undoButton, redoButton, eraseButton, textButton,
-            figuresButton, rightLayout, lineButton, arrowButton, rectangleButton,
+            figuresButton, rightLayout, lineButton, arrowButton, twoArrowButton, rectangleButton,
             circleButton, ellipseButton, drawAttrButton, moveButton, brightnessButton,
             saveButton, editLayout, buttonsLayout, seekBarButtonsLayout, exitButton;
     private ImageView undoImage, redoImage, penImage, eraseImage, moveImage, exitImage,
@@ -105,6 +105,7 @@ public class EditImageActivity extends AppCompatActivity {
                                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                                         bitmap = resource;
                                         backgroundImage.setImageBitmap(bitmap);
+
                                         brighten = true;
 
                                         brightnessImage.setColorFilter(getResources().getColor(android.R.color.black));
@@ -161,6 +162,7 @@ public class EditImageActivity extends AppCompatActivity {
         figuresButton = (LinearLayout) findViewById(R.id.figuresButton);
         lineButton = (LinearLayout) findViewById(R.id.lineButton);
         arrowButton = (LinearLayout) findViewById(R.id.arrowButton);
+        twoArrowButton = (LinearLayout) findViewById(R.id.twoarrowButton);
         rectangleButton = (LinearLayout) findViewById(R.id.rectangleButton);
         circleButton = findViewById(R.id.circleButton);
         ellipseButton = findViewById(R.id.ellipseButton);
@@ -426,6 +428,18 @@ public class EditImageActivity extends AppCompatActivity {
             }
         });
 
+        twoArrowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                myDrawView.setDrawingMode(DrawingMode.DRAW);
+                myDrawView.setDrawingTool(DrawingTool.TWOARROW);
+                invertRightLayout();
+                figuresImage.setImageResource(R.drawable.arrow);
+                figuresText.setText(getResources().getString(R.string.two_arrow));
+            }
+        });
+
         rectangleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -487,7 +501,9 @@ public class EditImageActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 tempBrightnessProgress = i;
-                backgroundImage.setImageBitmap(applyLightness(bitmap, i));
+
+                if (bitmap != null)
+                    backgroundImage.setImageBitmap(applyLightness(bitmap, i));
             }
 
             @Override

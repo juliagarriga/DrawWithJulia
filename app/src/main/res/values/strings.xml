@@ -24,6 +24,9 @@
 
     <string name="ok">OK</string>
 
+    <string name="reset_settings">Restablir configuració</string>
+    <string name="to_reset_settings">Vols recuperar els atributs per defecte?</string>
+
     <string name="save_image">Vols guardar la imatge?</string>
     <string name="apply_changes">Vols aplicar els canvis?</string>
     <string name="existing_image">La imatge ja està editada. Què vols fer?</string>
@@ -37,6 +40,7 @@
     <string name="curve">Curve</string>
     <string name="line">Line</string>
     <string name="arrow">Arrow</string>
+    <string name="two_arrow">Two Arrow</string>
     <string name="rectangle">Rect</string>
     <string name="circle">Circle</string>
     <string name="ellipse">Ellipse</string>

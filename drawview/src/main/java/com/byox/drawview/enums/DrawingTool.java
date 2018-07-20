@@ -8,6 +8,7 @@ public enum DrawingTool {
     PEN,
     LINE,
     ARROW,
+    TWOARROW,
     RECTANGLE,
     CIRCLE,
     ELLIPSE

@@ -1,7 +1,9 @@
 package proves.julia.drawwithjulia;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
@@ -14,9 +16,14 @@ import android.support.v7.widget.AppCompatRadioButton;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.byox.drawview.utils.SerializablePaint;
+
+import java.util.Random;
 
 /**
  * Created by Ing. Oscar G. Medina Cruz on 07/11/2016.
@@ -30,6 +37,35 @@ public class DrawAttrDialog extends DialogFragment {
     // VARS
     private Paint mPaint;
 
+    private View view;
+    private View previewColor;
+    private AppCompatSeekBar seekBarRed;
+    private AppCompatSeekBar seekBarGreen;
+    private AppCompatSeekBar seekBarBlue;
+    private TextView textViewRedValue;
+    private TextView textViewGreenValue;
+    private TextView textViewBlueValue;
+    private AppCompatSeekBar seekBarStrokeWidth;
+    private TextView textViewStrokeWidth;
+    private AppCompatSeekBar seekBarOpacity;
+    private TextView textViewOpacity;
+    private AppCompatSeekBar seekBarFontSize;
+    private TextView textViewFontSize;
+    private Button resetSettingsButton;
+    private AppCompatCheckBox appCompatCheckBoxAntiAlias;
+    private AppCompatCheckBox appCompatCheckBoxDither;
+    private AppCompatRadioButton appCompatRadioButtonFill;
+    private AppCompatRadioButton appCompatRadioButtonFillStroke;
+    private AppCompatRadioButton appCompatRadioButtonStroke;
+    private AppCompatRadioButton appCompatRadioButtonButt;
+    private AppCompatRadioButton appCompatRadioButtonRound;
+    private AppCompatRadioButton appCompatRadioButtonSquare;
+    private AppCompatRadioButton appCompatRadioButtonDefault;
+    private AppCompatRadioButton appCompatRadioButtonMonospace;
+    private AppCompatRadioButton appCompatRadioButtonSansSerif;
+    private AppCompatRadioButton appCompatRadioButtonSerif;
+
+
     public DrawAttrDialog() {
     }
 
@@ -40,63 +76,37 @@ public class DrawAttrDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final View view = LayoutInflater.from(getContext())
+        view = LayoutInflater.from(getContext())
                 .inflate(R.layout.layout_draw_attr, null);
 
-        final View previewColor = view.findViewById(R.id.preview_color);
-        final AppCompatSeekBar seekBarRed = (AppCompatSeekBar) view.findViewById(R.id.acsb_red);
-        final AppCompatSeekBar seekBarGreen = (AppCompatSeekBar) view.findViewById(R.id.acsb_green);
-        final AppCompatSeekBar seekBarBlue = (AppCompatSeekBar) view.findViewById(R.id.acsb_blue);
-        final TextView textViewRedValue = (TextView) view.findViewById(R.id.tv_current_red);
-        final TextView textViewGreenValue = (TextView) view.findViewById(R.id.tv_current_green);
-        final TextView textViewBlueValue = (TextView) view.findViewById(R.id.tv_current_blue);
-        AppCompatSeekBar seekBarStrokeWidth = (AppCompatSeekBar) view.findViewById(R.id.acsb_stroke_width);
-        final TextView textViewStrokeWidth = (TextView) view.findViewById(R.id.tv_stroke_width);
-        AppCompatSeekBar seekBarOpacity = (AppCompatSeekBar) view.findViewById(R.id.acsb_opacity);
-        final TextView textViewOpacity = (TextView) view.findViewById(R.id.tv_opacity);
-        final AppCompatSeekBar seekBarFontSize = (AppCompatSeekBar) view.findViewById(R.id.acsb_font_size);
-        final TextView textViewFontSize = (TextView) view.findViewById(R.id.tv_font_size);
-        AppCompatCheckBox appCompatCheckBoxAntiAlias = (AppCompatCheckBox) view.findViewById(R.id.chb_anti_alias);
-        AppCompatCheckBox appCompatCheckBoxDither = (AppCompatCheckBox) view.findViewById(R.id.chb_dither);
-        AppCompatRadioButton appCompatRadioButtonFill = (AppCompatRadioButton) view.findViewById(R.id.rb_fill);
-        AppCompatRadioButton appCompatRadioButtonFillStroke = (AppCompatRadioButton) view.findViewById(R.id.rb_fill_stroke);
-        AppCompatRadioButton appCompatRadioButtonStroke = (AppCompatRadioButton) view.findViewById(R.id.rb_stroke);
-        AppCompatRadioButton appCompatRadioButtonButt = (AppCompatRadioButton) view.findViewById(R.id.rb_butt);
-        AppCompatRadioButton appCompatRadioButtonRound = (AppCompatRadioButton) view.findViewById(R.id.rb_round);
-        AppCompatRadioButton appCompatRadioButtonSquare = (AppCompatRadioButton) view.findViewById(R.id.rb_square);
-        AppCompatRadioButton appCompatRadioButtonDefault = (AppCompatRadioButton) view.findViewById(R.id.rb_default);
-        AppCompatRadioButton appCompatRadioButtonMonospace = (AppCompatRadioButton) view.findViewById(R.id.rb_monospace);
-        AppCompatRadioButton appCompatRadioButtonSansSerif = (AppCompatRadioButton) view.findViewById(R.id.rb_sans_serif);
-        AppCompatRadioButton appCompatRadioButtonSerif = (AppCompatRadioButton) view.findViewById(R.id.rb_serif);
+        previewColor = view.findViewById(R.id.preview_color);
+        seekBarRed = (AppCompatSeekBar) view.findViewById(R.id.acsb_red);
+        seekBarGreen = (AppCompatSeekBar) view.findViewById(R.id.acsb_green);
+        seekBarBlue = (AppCompatSeekBar) view.findViewById(R.id.acsb_blue);
+        textViewRedValue = (TextView) view.findViewById(R.id.tv_current_red);
+        textViewGreenValue = (TextView) view.findViewById(R.id.tv_current_green);
+        textViewBlueValue = (TextView) view.findViewById(R.id.tv_current_blue);
+        seekBarStrokeWidth = (AppCompatSeekBar) view.findViewById(R.id.acsb_stroke_width);
+        textViewStrokeWidth = (TextView) view.findViewById(R.id.tv_stroke_width);
+        seekBarOpacity = (AppCompatSeekBar) view.findViewById(R.id.acsb_opacity);
+        textViewOpacity = (TextView) view.findViewById(R.id.tv_opacity);
+        seekBarFontSize = (AppCompatSeekBar) view.findViewById(R.id.acsb_font_size);
+        textViewFontSize = (TextView) view.findViewById(R.id.tv_font_size);
+        resetSettingsButton = view.findViewById(R.id.resetSettingsButton);
+        appCompatCheckBoxAntiAlias = (AppCompatCheckBox) view.findViewById(R.id.chb_anti_alias);
+        appCompatCheckBoxDither = (AppCompatCheckBox) view.findViewById(R.id.chb_dither);
+        appCompatRadioButtonFill = (AppCompatRadioButton) view.findViewById(R.id.rb_fill);
+        appCompatRadioButtonFillStroke = (AppCompatRadioButton) view.findViewById(R.id.rb_fill_stroke);
+        appCompatRadioButtonStroke = (AppCompatRadioButton) view.findViewById(R.id.rb_stroke);
+        appCompatRadioButtonButt = (AppCompatRadioButton) view.findViewById(R.id.rb_butt);
+        appCompatRadioButtonRound = (AppCompatRadioButton) view.findViewById(R.id.rb_round);
+        appCompatRadioButtonSquare = (AppCompatRadioButton) view.findViewById(R.id.rb_square);
+        appCompatRadioButtonDefault = (AppCompatRadioButton) view.findViewById(R.id.rb_default);
+        appCompatRadioButtonMonospace = (AppCompatRadioButton) view.findViewById(R.id.rb_monospace);
+        appCompatRadioButtonSansSerif = (AppCompatRadioButton) view.findViewById(R.id.rb_sans_serif);
+        appCompatRadioButtonSerif = (AppCompatRadioButton) view.findViewById(R.id.rb_serif);
 
-        previewColor.setBackgroundColor(mPaint.getColor());
-
-        seekBarRed.setProgress(Color.red(mPaint.getColor()));
-        seekBarGreen.setProgress(Color.green(mPaint.getColor()));
-        seekBarBlue.setProgress(Color.blue(mPaint.getColor()));
-        seekBarStrokeWidth.setProgress((int) mPaint.getStrokeWidth());
-        seekBarOpacity.setProgress((int) mPaint.getAlpha());
-        seekBarFontSize.setProgress((int) mPaint.getTextSize());
-
-        textViewRedValue.setText(String.valueOf(Color.red(mPaint.getColor())));
-        textViewGreenValue.setText(String.valueOf(Color.green(mPaint.getColor())));
-        textViewBlueValue.setText(String.valueOf(Color.blue(mPaint.getColor())));
-        textViewStrokeWidth.setText(getContext().getResources().getString(R.string.stroke_width, (int) mPaint.getStrokeWidth()));
-        textViewOpacity.setText(getContext().getResources().getString(R.string.opacity, (int) mPaint.getAlpha()));
-        textViewFontSize.setText(getContext().getResources().getString(R.string.font_size, 12));
-
-        appCompatCheckBoxAntiAlias.setChecked(mPaint.isAntiAlias());
-        appCompatCheckBoxDither.setChecked(mPaint.isDither());
-        appCompatRadioButtonFill.setChecked(mPaint.getStyle() == Paint.Style.FILL);
-        appCompatRadioButtonFillStroke.setChecked(mPaint.getStyle() == Paint.Style.FILL_AND_STROKE);
-        appCompatRadioButtonStroke.setChecked(mPaint.getStyle() == Paint.Style.STROKE);
-        appCompatRadioButtonButt.setChecked(mPaint.getStrokeCap() == Paint.Cap.BUTT);
-        appCompatRadioButtonRound.setChecked(mPaint.getStrokeCap() == Paint.Cap.ROUND);
-        appCompatRadioButtonSquare.setChecked(mPaint.getStrokeCap() == Paint.Cap.SQUARE);
-        appCompatRadioButtonDefault.setChecked(mPaint.getTypeface() == Typeface.DEFAULT);
-        appCompatRadioButtonMonospace.setChecked(mPaint.getTypeface() == Typeface.MONOSPACE);
-        appCompatRadioButtonSansSerif.setChecked(mPaint.getTypeface() == Typeface.SANS_SERIF);
-        appCompatRadioButtonSerif.setChecked(mPaint.getTypeface() == Typeface.SERIF);
+        updateAttributes();
 
         AppCompatSeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -118,7 +128,6 @@ public class DrawAttrDialog extends DialogFragment {
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         };
-
         seekBarRed.setOnSeekBarChangeListener(onSeekBarChangeListener);
         seekBarGreen.setOnSeekBarChangeListener(onSeekBarChangeListener);
         seekBarBlue.setOnSeekBarChangeListener(onSeekBarChangeListener);
@@ -267,6 +276,34 @@ public class DrawAttrDialog extends DialogFragment {
             }
         });
 
+
+
+        final DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        resetAttributes();
+                        updateAttributes();
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        break;
+                }
+            }
+        };
+
+        resetSettingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+                builder.setMessage(getResources().getString(R.string.to_reset_settings))
+                        .setPositiveButton(android.R.string.ok, clickListener)
+                        .setNegativeButton(android.R.string.no, clickListener).show();
+            }
+        });
+
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
                 .setView(view)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -286,9 +323,59 @@ public class DrawAttrDialog extends DialogFragment {
         return builder.create();
     }
 
+    private void resetAttributes() {
+        //Once entered, the user information must be saved to an internal, non-deleted source
+        SerializablePaint paint = new SerializablePaint();
+        paint.setColor(Color.BLACK);
+        paint.setStyle(SerializablePaint.Style.STROKE);
+        paint.setDither(true);
+        paint.setStrokeWidth(3);
+        paint.setAlpha(255);
+        paint.setAntiAlias(true);
+        paint.setStrokeCap(SerializablePaint.Cap.SQUARE);
+        paint.setTypeface(Typeface.DEFAULT);
+        paint.setTextSize(25);
+        setPaint(paint);
+    }
+
     // METHODS
     public void setPaint(Paint paint) {
         this.mPaint = paint;
+    }
+
+    private void updateAttributes() {
+
+        int colorRed = Color.red(mPaint.getColor());
+        int colorGreen = Color.green(mPaint.getColor());
+        int colorBlue = Color.blue(mPaint.getColor());
+        previewColor.setBackgroundColor(mPaint.getColor());
+
+        seekBarRed.setProgress(colorRed);
+        seekBarGreen.setProgress(colorGreen);
+        seekBarBlue.setProgress(colorBlue);
+        seekBarStrokeWidth.setProgress((int) mPaint.getStrokeWidth());
+        seekBarOpacity.setProgress((int) mPaint.getAlpha());
+        seekBarFontSize.setProgress((int) mPaint.getTextSize());
+
+        textViewRedValue.setText(String.valueOf(Color.red(mPaint.getColor())));
+        textViewGreenValue.setText(String.valueOf(Color.green(mPaint.getColor())));
+        textViewBlueValue.setText(String.valueOf(Color.blue(mPaint.getColor())));
+        textViewStrokeWidth.setText(getContext().getResources().getString(R.string.stroke_width, (int) mPaint.getStrokeWidth()));
+        textViewOpacity.setText(getContext().getResources().getString(R.string.opacity, (int) mPaint.getAlpha()));
+        textViewFontSize.setText(getContext().getResources().getString(R.string.font_size, (int) mPaint.getTextSize()));
+
+        appCompatCheckBoxAntiAlias.setChecked(mPaint.isAntiAlias());
+        appCompatCheckBoxDither.setChecked(mPaint.isDither());
+        appCompatRadioButtonFill.setChecked(mPaint.getStyle() == Paint.Style.FILL);
+        appCompatRadioButtonFillStroke.setChecked(mPaint.getStyle() == Paint.Style.FILL_AND_STROKE);
+        appCompatRadioButtonStroke.setChecked(mPaint.getStyle() == Paint.Style.STROKE);
+        appCompatRadioButtonButt.setChecked(mPaint.getStrokeCap() == Paint.Cap.BUTT);
+        appCompatRadioButtonRound.setChecked(mPaint.getStrokeCap() == Paint.Cap.ROUND);
+        appCompatRadioButtonSquare.setChecked(mPaint.getStrokeCap() == Paint.Cap.SQUARE);
+        appCompatRadioButtonDefault.setChecked(mPaint.getTypeface() == Typeface.DEFAULT);
+        appCompatRadioButtonMonospace.setChecked(mPaint.getTypeface() == Typeface.MONOSPACE);
+        appCompatRadioButtonSansSerif.setChecked(mPaint.getTypeface() == Typeface.SANS_SERIF);
+        appCompatRadioButtonSerif.setChecked(mPaint.getTypeface() == Typeface.SERIF);
     }
 
     // INTERFACE

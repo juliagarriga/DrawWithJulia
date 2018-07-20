@@ -248,6 +248,45 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                                 mContentCanvas.restore();
 
                                 break;
+                            case TWOARROW:
+
+                                float angle1 = (float) Math.toDegrees(Math.atan2(drawMove.getEndY() - drawMove.getStartY(),
+                                        drawMove.getEndX() - drawMove.getStartX())) - 90;
+                                float angle2 = (float) Math.toDegrees(Math.atan2(drawMove.getStartY() - drawMove.getEndY(),
+                                        drawMove.getStartX() - drawMove.getEndX())) - 90;
+                                angle1 = angle1 < 0 ? angle1 + 360 : angle1;
+                                angle2 = angle2 < 0 ? angle2 + 360 : angle2;
+                                middleWidth = 8f + drawMove.getPaint().getStrokeWidth();
+                                arrowHeadLarge = 30f + drawMove.getPaint().getStrokeWidth();
+
+                                mContentCanvas.drawLine(drawMove.getStartX(), drawMove.getStartY(),
+                                        drawMove.getEndX(), drawMove.getEndY(), drawMove.getPaint());
+
+                                mContentCanvas.save();
+                                mContentCanvas.translate(drawMove.getStartX(), drawMove.getStartY());
+                                mContentCanvas.rotate(angle2);
+                                mContentCanvas.drawLine(0f, 0f, middleWidth, 0f, drawMove.getPaint());
+                                mContentCanvas.drawLine(middleWidth, 0f, 0f, arrowHeadLarge, drawMove.getPaint());
+                                mContentCanvas.drawLine(0f, arrowHeadLarge, -middleWidth, 0f, drawMove.getPaint());
+                                mContentCanvas.drawLine(-middleWidth, 0f, 0f, 0f, drawMove.getPaint());
+                                mContentCanvas.restore();
+
+                                mContentCanvas.save();
+                                mContentCanvas.translate(drawMove.getEndX(), drawMove.getEndY());
+                                mContentCanvas.rotate(angle1);
+                                mContentCanvas.drawLine(0f, 0f, middleWidth, 0f, drawMove.getPaint());
+                                mContentCanvas.drawLine(middleWidth, 0f, 0f, arrowHeadLarge, drawMove.getPaint());
+                                mContentCanvas.drawLine(0f, arrowHeadLarge, -middleWidth, 0f, drawMove.getPaint());
+                                mContentCanvas.drawLine(-middleWidth, 0f, 0f, 0f, drawMove.getPaint());
+                                mContentCanvas.restore();
+
+                                if (drawMove.getText() != null && !drawMove.getText().equals("")) {
+                                    float middleX = drawMove.getStartX() + (drawMove.getEndX() - drawMove.getStartX())/2;
+                                    float middleY = drawMove.getStartY() + (drawMove.getEndY() - drawMove.getStartY())/2 - middleWidth;
+                                    mContentCanvas.drawText(drawMove.getText(), middleX, middleY, drawMove.getPaint());
+                                }
+
+                                break;
                             case RECTANGLE:
                                 mContentCanvas.drawRect(drawMove.getStartX(), drawMove.getStartY(),
                                         drawMove.getEndX(), drawMove.getEndY(), drawMove.getPaint());
@@ -421,7 +460,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                         }
                     }
 
-                    if (onDrawViewListener != null && mDrawingMode == DrawingMode.TEXT)
+                    if (onDrawViewListener != null && (mDrawingMode == DrawingMode.TEXT || (mDrawingMode == DrawingMode.DRAW && mDrawingTool == DrawingTool.TWOARROW)))
                         onDrawViewListener.onRequestText();
 
                     if (mDrawingMode == DrawingMode.MOVE) {
@@ -607,6 +646,8 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
         }
     }
 
+
+
     /**
      * Initialize view attributes
      *
@@ -625,7 +666,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
         int draw_paint_style = paintPrefs.getInt(context.getString(R.string.draw_paint_style), 2);
         int draw_corners = paintPrefs.getInt(context.getString(R.string.draw_corners), 2);
         int draw_typeface = paintPrefs.getInt(context.getString(R.string.draw_typeface), 0);
-        int draw_fontsize = paintPrefs.getInt(context.getString(R.string.draw_fontsize), 125);
+        int draw_fontsize = paintPrefs.getInt(context.getString(R.string.draw_fontsize), 25);
 
         TypedArray typedArray = context.getTheme().obtainStyledAttributes(
                 attrs, R.styleable.DrawView, 0, 0);
@@ -999,8 +1040,11 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
      * @param newText
      */
     public void refreshLastText(String newText) {
-        if (mDrawMoveHistory.get(mDrawMoveHistory.size() - 1)
-                .getDrawingMode() == DrawingMode.TEXT) {
+        DrawingMode drawingMode = mDrawMoveHistory.get(mDrawMoveHistory.size() - 1)
+                .getDrawingMode();
+        DrawingTool drawingTool = mDrawMoveHistory.get(mDrawMoveHistory.size() - 1)
+                .getDrawingTool();
+        if (drawingMode == DrawingMode.TEXT || (drawingMode == DrawingMode.DRAW && drawingTool == DrawingTool.TWOARROW)) {
             mDrawMoveHistory.get(mDrawMoveHistory.size() - 1).setText(newText);
             invalidate();
         } else
@@ -1559,6 +1603,19 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                                     move.addMove(mDrawMoveHistory.get(i));
                                 }
                                 break;
+                            case TWOARROW:
+
+                                rect = rectangle(drawMove);
+                                r = new Region(rect);
+
+                                if (r.contains((int) x, (int) y)) {
+
+                                    addMove(drawMove, vx, vy);
+
+                                    drawMove.getPaint().setColor(Color.RED);
+                                    move.addMove(mDrawMoveHistory.get(i));
+                                }
+                                break;
                             case RECTANGLE:
 
                                 if (checkInRectangle(x, y, drawMove.getStartX(), drawMove.getStartY(), drawMove.getEndX(), drawMove.getEndY())) {
@@ -1684,6 +1741,10 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                                 break;
 
                             case ARROW:
+
+                                moveMove(drawMove, vx, vy);
+                                break;
+                            case TWOARROW:
 
                                 moveMove(drawMove, vx, vy);
                                 break;
