@@ -571,7 +571,7 @@ public class EditImageActivity extends AppCompatActivity {
                         final String[] filename = file.getName().split("\\.");
                         Random random = new Random();
 
-                        saveFile(filepath.replace(filename[0], filename[0] + String.valueOf(random.nextInt(100))), drawBitmap);
+                        saveFile(filepath.replace(filename[0], filename[0] + String.valueOf(random.nextInt(100))), overlay(bitmap, drawBitmap));
                         if (finish)
                             finish();
                         break;
