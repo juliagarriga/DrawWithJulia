@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -132,11 +133,6 @@ public class EditImageActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-            myDrawView.setDeleteCoord(deleteMoveButton.getLeft(),
-                    deleteMoveButton.getTop(),
-                    deleteMoveButton.getRight(),
-                    deleteMoveButton.getBottom());
             myDrawView.setBackgroundColor(Color.TRANSPARENT);
 
 
@@ -144,6 +140,20 @@ public class EditImageActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        deleteMoveButton.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        myDrawView.setDeleteCoord(deleteMoveButton.getLeft(),
+                                deleteMoveButton.getTop(),
+                                deleteMoveButton.getRight(),
+                                deleteMoveButton.getBottom());
+
+                        // Don't forget to remove your listener when you are done with it.
+                        deleteMoveButton.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    }
+                });
 
     }
 
