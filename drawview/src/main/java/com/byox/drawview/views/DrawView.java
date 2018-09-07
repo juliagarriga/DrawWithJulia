@@ -303,7 +303,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                                         }
                                     }
 
-                                    // Llets calculate the size of the text
+                                    // Lets calculate the size of the text
                                     Rect textBounds = new Rect();
                                     drawMove.getPaint().getTextBounds(drawMove.getText(), 0,
                                             drawMove.getText().length(), textBounds);
@@ -313,12 +313,12 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                                     if (drawMove.getStartY() < drawMove.getEndY()) {
                                         if (angle1 < 45 || angle1 > 315) {
                                             drawMove.getPaint().setTextAlign(Paint.Align.LEFT);
-                                            middleX -= middleWidth;
+                                            middleX -= textWidth + 20 + angle2%45;
                                         }
                                     } else {
                                         if (angle2 < 45 || angle2 > 315) {
                                             drawMove.getPaint().setTextAlign(Paint.Align.RIGHT);
-                                            middleX += middleWidth;
+                                            middleX += textWidth + 20 + angle2%45;
                                         }
                                     }
 
@@ -346,6 +346,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                         break;
                     case TEXT:
                         if (drawMove.getText() != null && !drawMove.getText().equals("")) {
+                            drawMove.getPaint().setTextAlign(Paint.Align.CENTER);
                             mContentCanvas.drawText(drawMove.getText(), drawMove.getEndX(), drawMove.getEndY(), drawMove.getPaint());
                         }
                         break;
