@@ -106,10 +106,6 @@ public class EditImageActivity extends AppCompatActivity {
                                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                                             bitmap = resource;
                                             backgroundImage.setImageBitmap(bitmap);
-                                            myDrawView.setDeleteCoord(deleteMoveButton.getLeft(),
-                                                    deleteMoveButton.getTop(),
-                                                    deleteMoveButton.getRight(),
-                                                    deleteMoveButton.getBottom());
 
                                             brighten = true;
 
@@ -137,6 +133,10 @@ public class EditImageActivity extends AppCompatActivity {
                     }
                 });
 
+            myDrawView.setDeleteCoord(deleteMoveButton.getLeft(),
+                    deleteMoveButton.getTop(),
+                    deleteMoveButton.getRight(),
+                    deleteMoveButton.getBottom());
             myDrawView.setBackgroundColor(Color.TRANSPARENT);
 
 

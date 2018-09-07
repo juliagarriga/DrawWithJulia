@@ -307,25 +307,27 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
 
                                     // Lets calculate the size of the text
                                     Rect textBounds = new Rect();
-                                    drawMove.getPaint().getTextBounds(drawMove.getText(), 0,
+                                    SerializablePaint paint = getPaintParameters();
+                                    paint.setStyle(Paint.Style.FILL);
+                                    paint.setStrokeWidth(0);
+                                    paint.getTextBounds(drawMove.getText(), 0,
                                             drawMove.getText().length(), textBounds);
                                     int textWidth = textBounds.width();
                                     // CASE 2: THE ARROW IS VERTICAL
                                     if (drawMove.getStartY() < drawMove.getEndY()) {
-                                        // BOTTOM TO TOP
+                                        // TOP TO BOTTOM
                                         if (angle1 < 45 || angle1 > 315) {
                                             drawMove.getPaint().setTextAlign(Paint.Align.LEFT);
-                                            middleX -= textWidth + 20 + angle2%45;
+                                            middleX -= textWidth + 20 + 0.5*angle1%45;
                                         }
                                     } else {
-                                        // TOP TO BOTTOM
+                                        // BOTTOM TO TOP
                                         if (angle2 < 45 || angle2 > 315) {
-                                            drawMove.getPaint().setTextAlign(Paint.Align.RIGHT);
-                                            middleX += textWidth + 20 + angle2%45;
+                                            drawMove.getPaint().setTextAlign(Paint.Align.LEFT);
+                                            middleX += 20 + 0.5*angle2%45;
                                         }
                                     }
-
-                                    mContentCanvas.drawText(drawMove.getText(), middleX, middleY, drawMove.getPaint());
+                                    mContentCanvas.drawText(drawMove.getText(), middleX, middleY, paint);
                                 }
 
                                 break;

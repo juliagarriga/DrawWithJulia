@@ -39,6 +39,7 @@ public class DrawMove implements Serializable {
     private List<Move> mDrawingMovesList;
     private int mDrawingMovesListIndex = -1;
     private String mText;
+    private DrawMove linkedMove = null;
     private SerializableMatrix mBackgroundMatrix;
     private byte[] mBackgroundImage;
     private List<DrawMove> movedMoves;     // only for DrawingMode MOVE
@@ -184,6 +185,14 @@ public class DrawMove implements Serializable {
 
     public List<Float> getmPointsY() {
         return mDrawingMovesList.get(mDrawingMovesListIndex).getPointsY();
+    }
+
+    public void linkMove(DrawMove move) {
+        linkedMove = move;
+    }
+
+    public DrawMove getLinkedMove() {
+        return linkedMove;
     }
 
     public void addMove(DrawMove move) {
