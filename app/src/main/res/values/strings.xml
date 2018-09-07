@@ -48,6 +48,7 @@
     <!-- Draw Attributes -->
 
     <string name="stroke_width">Stroke width: %d</string>
+    <string name="text_size">Text size: %d</string>
     <string name="opacity">Opacity: %d</string>
     <string name="font_size">Font size: %d</string>
 

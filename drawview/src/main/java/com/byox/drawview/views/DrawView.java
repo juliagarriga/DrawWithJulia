@@ -398,7 +398,6 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
         float touchY = motionEvent.getY() / mZoomFactor + mCanvasClipBounds.top;
 
         int lastMoveIndex = 0;
-        boolean toRemove = false;
 
         if (motionEvent.getPointerCount() == 1) {
             switch (motionEvent.getActionMasked()) {
@@ -876,10 +875,13 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
         } else {
             paint.setColor(mDrawColor);
         }
-
-        paint.setStyle(mPaintStyle);
         paint.setDither(mDither);
-        paint.setStrokeWidth(mDrawWidth);
+        if (mDrawingMode != DrawingMode.TEXT) {
+            paint.setStrokeWidth(mDrawWidth);
+            paint.setStyle(mPaintStyle);
+        } else {
+            paint.setStyle(Paint.Style.FILL);
+        }
         paint.setAlpha(mDrawAlpha);
         paint.setAntiAlias(mAntiAlias);
         paint.setStrokeCap(mLineCap);
@@ -918,18 +920,25 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                     mDrawMoveHistory.get(mDrawMoveHistoryIndex).getPaint().getTypeface());
             currentPaint.setTextSize(mFontSize);
         } else {
-            currentPaint = new SerializablePaint();
-            currentPaint.setColor(mDrawColor);
-            currentPaint.setStyle(mPaintStyle);
-            currentPaint.setDither(mDither);
-            currentPaint.setStrokeWidth(mDrawWidth);
-            currentPaint.setAlpha(mDrawAlpha);
-            currentPaint.setAntiAlias(mAntiAlias);
-            currentPaint.setStrokeCap(mLineCap);
-            currentPaint.setTypeface(mFontFamily);
-            currentPaint.setTextSize(24f);
+            currentPaint = getPaintParameters();
         }
         return currentPaint;
+    }
+
+    public SerializablePaint getPaintParameters() {
+
+        SerializablePaint paint = new SerializablePaint();
+        paint.setColor(mDrawColor);
+        paint.setStyle(mPaintStyle);
+        paint.setDither(mDither);
+        paint.setStrokeWidth(mDrawWidth);
+        paint.setAlpha(mDrawAlpha);
+        paint.setAntiAlias(mAntiAlias);
+        paint.setStrokeCap(mLineCap);
+        paint.setTypeface(mFontFamily);
+        paint.setTextSize(mFontSize);
+
+        return paint;
     }
 
     /**

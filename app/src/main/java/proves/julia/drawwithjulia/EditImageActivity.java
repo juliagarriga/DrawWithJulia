@@ -680,7 +680,7 @@ public class EditImageActivity extends AppCompatActivity {
 
     private void changeDrawAttribs() {
         DrawAttrDialog drawAttribsDialog = DrawAttrDialog.newInstance();
-        drawAttribsDialog.setPaint(myDrawView.getCurrentPaintParams());
+        drawAttribsDialog.setPaint(myDrawView.getPaintParameters());
         drawAttribsDialog.setOnCustomViewDialogListener(new DrawAttrDialog.OnCustomViewDialogListener() {
             @Override
             public void onRefreshPaint(Paint newPaint) {
