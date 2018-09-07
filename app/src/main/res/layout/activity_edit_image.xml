@@ -8,13 +8,20 @@
 
     <ImageView
         android:id="@+id/backgroundImage"
+        android:layout_marginTop="60dp"
+        android:layout_marginBottom="60dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"/>
 
     <com.byox.drawview.views.DrawView
         android:id="@+id/draw_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></com.byox.drawview.views.DrawView>
+        android:layout_marginTop="60dp"
+        android:layout_marginBottom="60dp"
+        android:layout_height="match_parent">
+
+    </com.byox.drawview.views.DrawView>
 
     <LinearLayout
         android:id="@+id/rightLayout"
@@ -24,6 +31,16 @@
         android:background="@drawable/black_line_top"
         android:gravity="center"
         android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/lineButton"
@@ -167,7 +184,6 @@
 
         </LinearLayout>
 
-
         <LinearLayout
             android:id="@+id/ellipseButton"
             android:layout_width="match_parent"
@@ -193,15 +209,14 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="@string/ellipse"
-                android:textColor="@color/buttons_tint2" />
+                android:textColor="@color/buttons_tint" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="60dp"
             android:layout_gravity="center"
-            android:layout_weight="0.28"
             android:background="@android:color/transparent"
             android:gravity="center"
             android:orientation="vertical">
@@ -213,7 +228,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <LinearLayout
@@ -221,14 +236,14 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_gravity="top"
-            android:background="@drawable/white_transparent_gradient"
+            android:background="@drawable/black_line_top"
             android:gravity="center"
             android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@id/buttonsLayout">
+                android:id="@+id/buttonsLayout">
 
                 <LinearLayout
                     android:id="@+id/undoButton"
@@ -435,6 +450,18 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/deleteMoveButton"
+            android:layout_width="38dp"
+            android:padding="2dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center_horizontal"
+            android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/delete_icon2"
+            android:visibility="invisible" />
 
     </LinearLayout>
 

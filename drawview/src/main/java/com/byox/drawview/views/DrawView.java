@@ -21,7 +21,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
@@ -38,6 +37,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.byox.drawview.R;
@@ -53,12 +53,15 @@ import com.byox.drawview.utils.MatrixUtils;
 import com.byox.drawview.utils.SerializableMatrix;
 import com.byox.drawview.utils.SerializablePaint;
 import com.byox.drawview.utils.SerializablePath;
-import com.byox.drawview.utils.ViewUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.Math.abs;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 /**
  * Created by Ing. Oscar G. Medina Cruz on 06/11/2016.
@@ -69,7 +72,7 @@ import java.util.List;
  * This view can be configurated for change draw color, width size, can use tools like pen, line, circle, square.
  * </p>
  *
- * @author Ing. Oscar G. Medina Cruz
+ * @author Ing. Oscar G. Medina Cruz modified by Júlia Garriga Ferrer
  */
 public class DrawView extends FrameLayout implements View.OnTouchListener {
 
@@ -138,6 +141,10 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
     private int Epsilon = 80;
 
     private SharedPreferences paintPrefs;
+
+    private float deleteL, deleteT, deleteR, deleteB;
+
+    private ImageButton deleteMoveButton;
 
     /**
      * Default constructor
@@ -282,7 +289,39 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
 
                                 if (drawMove.getText() != null && !drawMove.getText().equals("")) {
                                     float middleX = drawMove.getStartX() + (drawMove.getEndX() - drawMove.getStartX())/2;
-                                    float middleY = drawMove.getStartY() + (drawMove.getEndY() - drawMove.getStartY())/2 - middleWidth;
+                                    float middleY = drawMove.getStartY() + (drawMove.getEndY() - drawMove.getStartY())/2;
+                                    if (drawMove.getStartX() > drawMove.getEndX()) {
+                                        if (angle1 < 135 && angle1 > 45) {
+                                            drawMove.getPaint().setTextAlign(Paint.Align.CENTER);
+                                            middleY = drawMove.getStartY() + (drawMove.getEndY() - drawMove.getStartY())/2 -
+                                                    (middleWidth + 2*(abs(angle1-90)));
+                                        }
+                                    } else {
+                                        if (angle2 < 135 && angle2 > 45) {
+                                            drawMove.getPaint().setTextAlign(Paint.Align.CENTER);
+                                            middleY -= middleWidth + 2 * abs(angle2 - 90);
+                                        }
+                                    }
+
+                                    // Llets calculate the size of the text
+                                    Rect textBounds = new Rect();
+                                    drawMove.getPaint().getTextBounds(drawMove.getText(), 0,
+                                            drawMove.getText().length(), textBounds);
+                                    int textWidth = textBounds.width();
+                                    int textHeight = textBounds.height();
+
+                                    if (drawMove.getStartY() < drawMove.getEndY()) {
+                                        if (angle1 < 45 || angle1 > 315) {
+                                            drawMove.getPaint().setTextAlign(Paint.Align.LEFT);
+                                            middleX -= middleWidth;
+                                        }
+                                    } else {
+                                        if (angle2 < 45 || angle2 > 315) {
+                                            drawMove.getPaint().setTextAlign(Paint.Align.RIGHT);
+                                            middleX += middleWidth;
+                                        }
+                                    }
+
                                     mContentCanvas.drawText(drawMove.getText(), middleX, middleY, drawMove.getPaint());
                                 }
 
@@ -297,10 +336,10 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                                                 drawMove.getEndX(), drawMove.getEndY()), drawMove.getPaint());
                                 break;
                             case ELLIPSE:
-                                mAuxRect.set(drawMove.getEndX() - Math.abs(drawMove.getEndX() - drawMove.getStartX()),
-                                        drawMove.getEndY() - Math.abs(drawMove.getEndY() - drawMove.getStartY()),
-                                        drawMove.getEndX() + Math.abs(drawMove.getEndX() - drawMove.getStartX()),
-                                        drawMove.getEndY() + Math.abs(drawMove.getEndY() - drawMove.getStartY()));
+                                mAuxRect.set(drawMove.getEndX() - abs(drawMove.getEndX() - drawMove.getStartX()),
+                                        drawMove.getEndY() - abs(drawMove.getEndY() - drawMove.getStartY()),
+                                        drawMove.getEndX() + abs(drawMove.getEndX() - drawMove.getStartX()),
+                                        drawMove.getEndY() + abs(drawMove.getEndY() - drawMove.getStartY()));
                                 mContentCanvas.drawOval(mAuxRect, drawMove.getPaint());
                                 break;
                         }
@@ -435,7 +474,8 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                 case MotionEvent.ACTION_UP:
                     lastMoveIndex = mDrawMoveHistory.size() - 1;
 
-                    if (mLastTouchEvent == MotionEvent.ACTION_DOWN && mDrawingMode != DrawingMode.TEXT) {
+                    if (mLastTouchEvent == MotionEvent.ACTION_DOWN && mDrawingMode != DrawingMode.TEXT
+                        && mDrawingMode != DrawingMode.MOVE) {
                         if (mDrawMoveHistory.size() > 0) {
                             mDrawMoveHistory.remove(lastMoveIndex);
                             mDrawMoveHistoryIndex--;
@@ -463,15 +503,16 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                     if (onDrawViewListener != null && (mDrawingMode == DrawingMode.TEXT || (mDrawingMode == DrawingMode.DRAW && mDrawingTool == DrawingTool.TWOARROW)))
                         onDrawViewListener.onRequestText();
 
-                    if (mDrawingMode == DrawingMode.MOVE) {
-                        if (mDrawMoveHistory.get(lastMoveIndex).getMovedMoves().size() == 0) {
-                            mDrawMoveHistory.remove(lastMoveIndex);
-                            mDrawMoveHistoryIndex--;
-                            lastMoveIndex--;
-                        } else {
-                            moveDraw(mDrawMoveHistory.get(lastMoveIndex), true);
+                    if (mDrawMoveHistory.size() > 0)
+                        if (mDrawMoveHistory.get(lastMoveIndex).getDrawingMode() == DrawingMode.MOVE) {
+                            if (mDrawMoveHistory.get(lastMoveIndex).getMovedMoves().size() == 0) {
+                                mDrawMoveHistory.remove(lastMoveIndex);
+                                mDrawMoveHistoryIndex--;
+                                lastMoveIndex--;
+                            } else {
+                                moveDraw(mDrawMoveHistory.get(lastMoveIndex), true);
+                            }
                         }
-                    }
 
                     if (onDrawViewListener != null)
                         onDrawViewListener.onEndDrawing();
@@ -494,6 +535,13 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
 
         this.invalidate(mInvalidateRect.left, mInvalidateRect.top, mInvalidateRect.right, mInvalidateRect.bottom);
         return true;
+    }
+
+    public void setDeleteCoord(float l, float t, float r, float b) {
+        deleteL = l;
+        deleteT = t;
+        deleteR = r;
+        deleteB = b;
     }
 
     @Override
@@ -615,7 +663,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
             init.recycle();
             mContentCanvas = new Canvas(mContentBitmap);
 
-            FrameLayout.LayoutParams layoutParams = new LayoutParams(getWidth() / 4, getHeight() / 4,
+            LayoutParams layoutParams = new LayoutParams(getWidth() / 4, getHeight() / 4,
                     Gravity.TOP | Gravity.END);
             layoutParams.setMargins(12, 12, 12, 12);
             mZoomRegionCardView = new CardView(getContext());
@@ -625,7 +673,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
             mZoomRegionCardView.setUseCompatPadding(true);
             mZoomRegionCardView.setVisibility(View.INVISIBLE);
 
-            CardView.LayoutParams childLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+            LayoutParams childLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT);
             mZoomRegionView = new ZoomRegionView(getContext());
             mZoomRegionView.setLayoutParams(childLayoutParams);
@@ -666,7 +714,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
         int draw_paint_style = paintPrefs.getInt(context.getString(R.string.draw_paint_style), 2);
         int draw_corners = paintPrefs.getInt(context.getString(R.string.draw_corners), 2);
         int draw_typeface = paintPrefs.getInt(context.getString(R.string.draw_typeface), 0);
-        int draw_fontsize = paintPrefs.getInt(context.getString(R.string.draw_fontsize), 25);
+        int draw_fontsize = paintPrefs.getInt(context.getString(R.string.draw_fontsize), 60);
 
         TypedArray typedArray = context.getTheme().obtainStyledAttributes(
                 attrs, R.styleable.DrawView, 0, 0);
@@ -774,7 +822,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                 mFontFamily = Typeface.SANS_SERIF;
             else if (typeface == 3)
                 mFontFamily = Typeface.SERIF;
-            mFontSize = typedArray.getInteger(R.styleable.DrawView_dv_draw_font_size, 125);
+            mFontSize = typedArray.getInteger(R.styleable.DrawView_dv_draw_font_size, 60);
             isForCamera = typedArray.getBoolean(R.styleable.DrawView_dv_draw_is_camera, false);
             int orientation = typedArray.getInteger(R.styleable.DrawView_dv_draw_orientation,
                     getWidth() > getHeight() ? 1 : 0);
@@ -1646,10 +1694,10 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
 
                             case ELLIPSE:
 
-                                startX = drawMove.getEndX() - Math.abs(drawMove.getEndX() - drawMove.getStartX());
-                                startY = drawMove.getEndY() - Math.abs(drawMove.getEndY() - drawMove.getStartY());
-                                endX = drawMove.getEndX() + Math.abs(drawMove.getEndX() - drawMove.getStartX());
-                                endY = drawMove.getEndY() + Math.abs(drawMove.getEndY() - drawMove.getStartY());
+                                startX = drawMove.getEndX() - abs(drawMove.getEndX() - drawMove.getStartX());
+                                startY = drawMove.getEndY() - abs(drawMove.getEndY() - drawMove.getStartY());
+                                endX = drawMove.getEndX() + abs(drawMove.getEndX() - drawMove.getStartX());
+                                endY = drawMove.getEndY() + abs(drawMove.getEndY() - drawMove.getStartY());
 
                                 if (checkInRectangle(x, y, startX, startY, endX, endY)) {
 
@@ -1771,8 +1819,20 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                         break;
                 }
 
-                if (lastMove)
+
+                if (checkInRectangle(move.getEndX(), move.getEndY(), deleteL, deleteB, deleteR, deleteT))
+                    onDrawViewListener.onDeleteDrawing(true);
+                else
+                    onDrawViewListener.onDeleteDrawing(false);
+
+
+                if (lastMove) {
                     drawMove.resetColor();
+
+                    if (checkInRectangle(move.getEndX(), move.getEndY(), deleteL, deleteB, deleteR, deleteT)) {
+                        addMove(drawMove, -drawMove.getStartX(), -drawMove.getStartY());
+                    }
+                }
             }
 
         }
@@ -1781,16 +1841,16 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
     // PRIVATE METHODS
 
     private boolean checkInRectangle(float x, float y, float startX, float startY, float endX, float endY) {
-        if (Math.abs(x - startX) < Epsilon)
+        if (abs(x - startX) < Epsilon)
             if (y >= (startY - Epsilon)  && y <= (endY + Epsilon))
                 return true;
-        if (Math.abs(x - endX) < Epsilon)
+        if (abs(x - endX) < Epsilon)
             if (y >= (startY - Epsilon)  && y <= (endY + Epsilon))
                 return true;
-        if (Math.abs(y - startY) < Epsilon)
+        if (abs(y - startY) < Epsilon)
             if (x >= (startX - Epsilon)  && x <= (endX + Epsilon))
                 return true;
-        if (Math.abs(y - endY) < Epsilon)
+        if (abs(y - endY) < Epsilon)
             if (x >= (startX - Epsilon)  && x <= (endX + Epsilon))
                 return true;
 
@@ -1829,21 +1889,10 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
 
         float startX, startY, endX, endY;
 
-        if (drawMove.getStartX() < drawMove.getEndX()) {
-            startX = drawMove.getStartX();
-            endX = drawMove.getEndX();
-        } else {
-            endX = drawMove.getStartX();
-            startX = drawMove.getEndX();
-        }
-
-        if (drawMove.getStartY() < drawMove.getEndY()) {
-            startY = drawMove.getStartY();
-            endY = drawMove.getEndY();
-        } else {
-            endY = drawMove.getStartY();
-            startY = drawMove.getEndY();
-        }
+        startX = min(drawMove.getStartX(), drawMove.getEndX()) - 30;
+        endX = max(drawMove.getStartX(), drawMove.getEndX()) + 30;
+        startY = min(drawMove.getStartY(), drawMove.getEndY()) - 30;
+        endY = max(drawMove.getStartY(), drawMove.getEndY()) + 30;
 
         return new Rect((int) startX, (int) startY,
                 (int) endX, (int) endY);
@@ -1852,8 +1901,8 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
 
     private double computeRadius(float startX, float startY, float endX, float endY) {
 
-        float x = Math.abs(startX - endX);
-        float y = Math.abs(startY - endY);
+        float x = abs(startX - endX);
+        float y = abs(startY - endY);
 
         return Math.sqrt(x*x + y*y);
     }
@@ -1919,7 +1968,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
             if (mZoomEnabled) {
                 mFromZoomRegion = false;
                 mZoomFactor *= detector.getScaleFactor();
-                mZoomFactor = Math.max(1f, Math.min(mZoomFactor, mMaxZoomFactor));
+                mZoomFactor = max(1f, min(mZoomFactor, mMaxZoomFactor));
                 mZoomFactor = mZoomFactor > mMaxZoomFactor ? mMaxZoomFactor : mZoomFactor < 1f ? 1f : mZoomFactor;
                 mZoomCenterX = detector.getFocusX() / mZoomFactor + mCanvasClipBounds.left;
                 mZoomCenterY = detector.getFocusY() / mZoomFactor + mCanvasClipBounds.top;
@@ -2000,6 +2049,8 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
      */
     public interface OnDrawViewListener {
         void onStartDrawing();
+
+        void onDeleteDrawing(boolean toDelete);
 
         void onEndDrawing();
 

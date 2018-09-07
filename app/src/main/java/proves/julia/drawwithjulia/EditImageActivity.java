@@ -1,6 +1,5 @@
 package proves.julia.drawwithjulia;
 
-import android.animation.LayoutTransition;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -15,7 +14,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -57,16 +56,17 @@ public class EditImageActivity extends AppCompatActivity {
     private LinearLayout pencilButton, undoButton, redoButton, eraseButton, textButton,
             figuresButton, rightLayout, lineButton, arrowButton, twoArrowButton, rectangleButton,
             circleButton, ellipseButton, drawAttrButton, moveButton, brightnessButton,
-            saveButton, editLayout, buttonsLayout, seekBarButtonsLayout, exitButton;
+            saveButton, editLayout, buttonsLayout, seekBarButtonsLayout, exitButton, topLayout;
     private ImageView undoImage, redoImage, penImage, eraseImage, moveImage, exitImage,
             textImage, drawAttrImage, figuresImage, backgroundImage, brightnessImage, saveImage;
     private TextView undoText, redoText, penText, eraseText, moveText, textText,
             drawAttrText, figuresText, brightnessText, saveText, exitText;
     private SeekBar seekBar;
     private Bitmap bitmap;
-    private String filepath;
+    private String filepath, name;
     private OutputMediaFile outputMediaFile;
     private ImageView selectedImage;
+    public static ImageButton deleteMoveButton;
     private TextView selectedText;
     private int brightnessProgress, savedBrightness, tempBrightnessProgress;
     private boolean brighten = false;
@@ -87,6 +87,7 @@ public class EditImageActivity extends AppCompatActivity {
         try {
 
             filepath = getIntent().getStringExtra("image");
+            name = getIntent().getStringExtra("name");
             //bitmap = BitmapFactory.decodeFile(path, options);
 
             if (filepath != null)
@@ -96,22 +97,26 @@ public class EditImageActivity extends AppCompatActivity {
                         try {
 
                             Glide.with(EditImageActivity.this)
-                                .asBitmap()
-                                .load(filepath)
-                                .apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
-                                        .skipMemoryCache(true))
-                                .into(new SimpleTarget<Bitmap>() {
-                                    @Override
-                                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                                        bitmap = resource;
-                                        backgroundImage.setImageBitmap(bitmap);
+                                    .asBitmap()
+                                    .load(filepath)
+                                    .apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
+                                            .skipMemoryCache(true))
+                                    .into(new SimpleTarget<Bitmap>() {
+                                        @Override
+                                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                            bitmap = resource;
+                                            backgroundImage.setImageBitmap(bitmap);
+                                            myDrawView.setDeleteCoord(deleteMoveButton.getLeft(),
+                                                    deleteMoveButton.getTop(),
+                                                    deleteMoveButton.getRight(),
+                                                    deleteMoveButton.getBottom());
 
-                                        brighten = true;
+                                            brighten = true;
 
-                                        brightnessImage.setColorFilter(getResources().getColor(android.R.color.black));
-                                        brightnessText.setTextColor(getResources().getColor(android.R.color.black));
-                                    }
-                                });
+                                            brightnessImage.setColorFilter(getResources().getColor(android.R.color.black));
+                                            brightnessText.setTextColor(getResources().getColor(android.R.color.black));
+                                        }
+                                    });
 
                             /*if (bitmap != null) {
 
@@ -152,6 +157,7 @@ public class EditImageActivity extends AppCompatActivity {
 
         parentLayout = (FrameLayout) findViewById(R.id.parentLayout);
         rightLayout = (LinearLayout) findViewById(R.id.rightLayout);
+        topLayout = findViewById(R.id.topLayout);
         drawAttrButton = (LinearLayout) findViewById(R.id.drawAttrButton);
         pencilButton = (LinearLayout) findViewById(R.id.pencilButton);
         moveButton = (LinearLayout) findViewById(R.id.moveButton);
@@ -169,6 +175,7 @@ public class EditImageActivity extends AppCompatActivity {
         saveButton = findViewById(R.id.saveButton);
         brightnessButton = findViewById(R.id.brightnessButton);
         exitButton = findViewById(R.id.exitButton);
+        deleteMoveButton = findViewById(R.id.deleteMoveButton);
 
         undoImage = findViewById(R.id.undo_icon);
         redoImage = findViewById(R.id.redo_icon);
@@ -200,7 +207,7 @@ public class EditImageActivity extends AppCompatActivity {
 
         backgroundImage = findViewById(R.id.backgroundImage);
 
-        parentLayout.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+        //parentLayout.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
 
         drawAttrButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -319,7 +326,22 @@ public class EditImageActivity extends AppCompatActivity {
         cancelEditButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                backgroundImage.setImageBitmap(applyLightness(bitmap, brightnessProgress));
+                Glide.with(EditImageActivity.this)
+                        .asBitmap()
+                        .load(bitmap)
+                        .apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
+                                .skipMemoryCache(true))
+                        .into(new SimpleTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                Canvas canvas = new Canvas(resource);
+
+                                Paint paint = new Paint();
+                                paint.setColorFilter(applyLightness(resource, brightnessProgress));
+                                canvas.drawBitmap(bitmap, 0, 0, paint);
+                                backgroundImage.setImageBitmap(resource);
+                            }
+                        });
                 //invertEditLayout();
                 toggleVisibilities(true);
             }
@@ -435,7 +457,7 @@ public class EditImageActivity extends AppCompatActivity {
                 myDrawView.setDrawingMode(DrawingMode.DRAW);
                 myDrawView.setDrawingTool(DrawingTool.TWOARROW);
                 invertRightLayout();
-                figuresImage.setImageResource(R.drawable.arrow);
+                figuresImage.setImageResource(R.drawable.twoarrow);
                 figuresText.setText(getResources().getString(R.string.two_arrow));
             }
         });
@@ -499,11 +521,28 @@ public class EditImageActivity extends AppCompatActivity {
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            public void onProgressChanged(SeekBar seekBar, final int i, boolean b) {
                 tempBrightnessProgress = i;
 
                 if (bitmap != null)
-                    backgroundImage.setImageBitmap(applyLightness(bitmap, i));
+                    Glide.with(EditImageActivity.this)
+                            .asBitmap()
+                            .load(bitmap)
+                            .apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
+                                    .skipMemoryCache(true))
+                            .into(new SimpleTarget<Bitmap>() {
+                                @Override
+                                public void onResourceReady(@NonNull Bitmap bmp, @Nullable Transition<? super Bitmap> transition) {
+                                    Bitmap ret= Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), Bitmap.Config.RGB_565);
+
+                                    Canvas canvas = new Canvas(ret);
+
+                                    Paint paint = new Paint();
+                                    paint.setColorFilter(applyLightness(ret, i));
+                                    canvas.drawBitmap(bitmap, 0, 0, paint);
+                                    backgroundImage.setImageBitmap(ret);
+                                }
+                            });
             }
 
             @Override
@@ -518,16 +557,30 @@ public class EditImageActivity extends AppCompatActivity {
         });
     }
 
-
-
-    private void saveFile(String filepath, Bitmap bitmap) {
+    private void saveFile(String filepath, final Bitmap bitmap) {
 
         try {
 
             File file = new File(filepath);
             file.createNewFile();
-            FileOutputStream outputStream = new FileOutputStream(file);
-            applyLightness(bitmap, brightnessProgress).compress(Bitmap.CompressFormat.JPEG, 20, outputStream);
+            final FileOutputStream outputStream = new FileOutputStream(file);
+
+            Glide.with(EditImageActivity.this)
+                    .asBitmap()
+                    .load(bitmap)
+                    .apply(new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .skipMemoryCache(true))
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            Canvas canvas = new Canvas(resource);
+
+                            Paint paint = new Paint();
+                            paint.setColorFilter(applyLightness(resource, brightnessProgress));
+                            canvas.drawBitmap(bitmap, 0, 0, paint);
+                            resource.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                        }
+                    });
             myDrawView.save();
             savedBrightness = brightnessProgress;
 
@@ -536,12 +589,11 @@ public class EditImageActivity extends AppCompatActivity {
         }
     }
 
-
     private void saveDraw(final boolean finish) {
 
         final File file;
         if (filepath == null)
-            file = outputMediaFile.getOutputMediaFile("DRW", true);
+            file = outputMediaFile.getOutputMediaFile(name + "_DRW", true);
         else
             file = outputMediaFile.getOutputMediaFile(filepath, false);
 
@@ -594,10 +646,10 @@ public class EditImageActivity extends AppCompatActivity {
     }
 
     private static Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
-        Bitmap bmOverlay = Bitmap.createBitmap(bmp2.getWidth(), bmp2.getHeight(), bmp1.getConfig());
+        Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
         Canvas canvas = new Canvas(bmOverlay);
-        canvas.drawBitmap(Bitmap.createScaledBitmap(bmp1, bmp2.getWidth(), bmp2.getHeight(), false), new Matrix(), null);
-        canvas.drawBitmap(bmp2, 0, 0, null);
+        canvas.drawBitmap(bmp1, new Matrix(), null);
+        canvas.drawBitmap(Bitmap.createScaledBitmap(bmp2, bmp1.getWidth(), bmp1.getHeight(), false), 0, 0, null);
         return bmOverlay;
     }
 
@@ -610,9 +662,9 @@ public class EditImageActivity extends AppCompatActivity {
         rightLayout.setLayoutParams(params);
     }
 
-    public static Bitmap applyLightness(Bitmap bmp, int progress) {
+    public PorterDuffColorFilter applyLightness(final Bitmap bmp, int progress) {
 
-        PorterDuffColorFilter porterDuffColorFilter;
+        final PorterDuffColorFilter porterDuffColorFilter;
 
         if (progress > 100) {
             int value = (progress - 100) * 255 / 100;
@@ -622,25 +674,8 @@ public class EditImageActivity extends AppCompatActivity {
             porterDuffColorFilter = new PorterDuffColorFilter(Color.argb(value, 0, 0, 0), PorterDuff.Mode.SRC_ATOP);
         }
 
-        Bitmap ret = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), bmp.getConfig());
+        return porterDuffColorFilter;
 
-        Canvas canvas = new Canvas(ret);
-
-        Paint paint = new Paint();
-        paint.setColorFilter(porterDuffColorFilter);
-        canvas.drawBitmap(bmp, 0, 0, paint);
-
-        return ret;
-
-    }
-
-    private void invertEditLayout() {
-
-        ViewGroup.LayoutParams params = editLayout.getLayoutParams();
-
-        params.height = params.height == 0 ? ViewGroup.LayoutParams.WRAP_CONTENT : 0;
-
-        editLayout.setLayoutParams(params);
     }
 
     private void changeDrawAttribs() {
@@ -725,11 +760,25 @@ public class EditImageActivity extends AppCompatActivity {
         myDrawView.setOnDrawViewListener(new DrawView.OnDrawViewListener() {
             @Override
             public void onStartDrawing() {
-                //canUndoRedo();
+                if (myDrawView.getDrawingMode() == DrawingMode.MOVE) {
+                    invertLayouts(true);
+                }
+            }
+
+            @Override
+            public void onDeleteDrawing(boolean toDelete) {
+
+                if (toDelete)
+                    deleteMoveButton.setImageDrawable(getResources().getDrawable(R.drawable.red_trash));
+                else
+                    deleteMoveButton.setImageDrawable(getResources().getDrawable(R.drawable.delete_icon2));
+
             }
 
             @Override
             public void onEndDrawing() {
+                deleteMoveButton.setImageDrawable(getResources().getDrawable(R.drawable.delete_icon2));
+                invertLayouts(false);
                 canUndoRedoSave();
             }
 
@@ -795,19 +844,28 @@ public class EditImageActivity extends AppCompatActivity {
 
         if (seekBarButtonsLayout.getVisibility() == View.VISIBLE) {
 
+            myDrawView.setEnabled(true);
             seekBarButtonsLayout.setVisibility(View.GONE);
             buttonsLayout.setVisibility(View.VISIBLE);
 
             return false;
 
         } else if (toToggle) {
-
+            myDrawView.setEnabled(false);
             seekBarButtonsLayout.setVisibility(View.VISIBLE);
             buttonsLayout.setVisibility(View.GONE);
 
         }
 
         return true;
+    }
+
+    private void invertLayouts(boolean toDelete) {
+        if (toDelete) {
+            deleteMoveButton.setVisibility(View.VISIBLE);
+        } else {
+            deleteMoveButton.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void exit() {
@@ -846,6 +904,7 @@ public class EditImageActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        exit();
+        if (toggleVisibilities(false))
+            exit();
     }
 }
