@@ -290,13 +290,15 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                                 if (drawMove.getText() != null && !drawMove.getText().equals("")) {
                                     float middleX = drawMove.getStartX() + (drawMove.getEndX() - drawMove.getStartX())/2;
                                     float middleY = drawMove.getStartY() + (drawMove.getEndY() - drawMove.getStartY())/2;
+                                    //CASE 1: The arrow is HORIZONTAL
                                     if (drawMove.getStartX() > drawMove.getEndX()) {
+                                        // RIGHT TO LEFT
                                         if (angle1 < 135 && angle1 > 45) {
                                             drawMove.getPaint().setTextAlign(Paint.Align.CENTER);
-                                            middleY = drawMove.getStartY() + (drawMove.getEndY() - drawMove.getStartY())/2 -
-                                                    (middleWidth + 2*(abs(angle1-90)));
+                                            middleY -= middleWidth + 2 * abs(angle1 - 90);
                                         }
                                     } else {
+                                        // LEFT TO RIGHT
                                         if (angle2 < 135 && angle2 > 45) {
                                             drawMove.getPaint().setTextAlign(Paint.Align.CENTER);
                                             middleY -= middleWidth + 2 * abs(angle2 - 90);
@@ -308,14 +310,15 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                                     drawMove.getPaint().getTextBounds(drawMove.getText(), 0,
                                             drawMove.getText().length(), textBounds);
                                     int textWidth = textBounds.width();
-                                    int textHeight = textBounds.height();
-
+                                    // CASE 2: THE ARROW IS VERTICAL
                                     if (drawMove.getStartY() < drawMove.getEndY()) {
+                                        // BOTTOM TO TOP
                                         if (angle1 < 45 || angle1 > 315) {
                                             drawMove.getPaint().setTextAlign(Paint.Align.LEFT);
                                             middleX -= textWidth + 20 + angle2%45;
                                         }
                                     } else {
+                                        // TOP TO BOTTOM
                                         if (angle2 < 45 || angle2 > 315) {
                                             drawMove.getPaint().setTextAlign(Paint.Align.RIGHT);
                                             middleX += textWidth + 20 + angle2%45;

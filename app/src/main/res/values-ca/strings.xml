@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">Draw With Julia</string>
+
+    <!-- Edit buttons -->
+    <string name="save">Guardar</string>
+    <string name="exit">Sortir</string>
+    <string name="apply">Aplicar</string>
+    <string name="camera">Càmera</string>
+    <string name="brightness">Brillantor</string>
+    <string name="undo">Desfer</string>
+    <string name="redo">Refer</string>
+    <string name="pen">Llapis</string>
+    <string name="move">Moure</string>
+    <string name="rubber">Goma d\'esborrar</string>
+    <string name="drawAttr">Atrs de dibuix</string>
+    <string name="text">Text</string>
+    <string name="figures">Figures</string>
+
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+
+    <string name="ok">OK</string>
+
+    <string name="reset_settings">Restablir configuració</string>
+    <string name="to_reset_settings">Vols recuperar els atributs per defecte?</string>
+
+    <string name="save_image">Vols guardar la imatge?</string>
+    <string name="apply_changes">Vols aplicar els canvis?</string>
+    <string name="existing_image">La imatge ja està editada. Què vols fer?</string>
+    <string name="replace_image">Reemplaçar-la</string>
+    <string name="new_image">Crear-ne una nova</string>
+
+    <string name="delete_images">Vols esborrar les imatges?</string>
+    <string name="delete_image">Vols esborrar la imatge?</string>
+
+    <!-- Figures buttons -->
+    <string name="curve">Curva</string>
+    <string name="line">Línia</string>
+    <string name="arrow">Fletxa</string>
+    <string name="two_arrow">Doble fletxa</string>
+    <string name="rectangle">Rect</string>
+    <string name="circle">Cercle</string>
+    <string name="ellipse">El·lipse</string>
+
+    <!-- Draw Attributes -->
+
+    <string name="stroke_width">Gruixudesa: %d</string>
+    <string name="opacity">Opacitat: %d</string>
+    <string name="font_size">Mida del text: %d</string>
+
+</resources>

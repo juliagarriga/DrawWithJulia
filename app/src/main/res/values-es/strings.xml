@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">Draw With Julia</string>
+
+    <!-- Edit buttons -->
+    <string name="save">Guardar</string>
+    <string name="exit">Salir</string>
+    <string name="apply">Aplicar</string>
+    <string name="camera">Camera</string>
+    <string name="brightness">Brillo</string>
+    <string name="undo">Deshacer</string>
+    <string name="redo">Rehacer</string>
+    <string name="pen">Lapiz</string>
+    <string name="move">Mover</string>
+    <string name="rubber">Goma</string>
+    <string name="drawAttr">Atrs de dibujo</string>
+    <string name="text">Texto</string>
+    <string name="figures">Figuras</string>
+
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+
+    <string name="ok">OK</string>
+
+    <string name="reset_settings">Restablecer configuración</string>
+    <string name="to_reset_settings">Quiere recuperar los valores por defecto?</string>
+
+    <string name="save_image">Quiere guardar la imagen?</string>
+    <string name="apply_changes">Quiere aplicar los canvios?</string>
+    <string name="existing_image">La imagen ya está editada. Que desea hacer?</string>
+    <string name="replace_image">Reemplazarla</string>
+    <string name="new_image">Crear una nueva</string>
+
+    <string name="delete_images">Està seguro que quiere borrar estas imágenes?</string>
+    <string name="delete_image">Està seguro que quiere borrar esta imagen?</string>
+
+    <!-- Figures buttons -->
+    <string name="curve">Curva</string>
+    <string name="line">Linea</string>
+    <string name="arrow">Flecha</string>
+    <string name="two_arrow">Doble flecha</string>
+    <string name="rectangle">Rect</string>
+    <string name="circle">Círculo</string>
+    <string name="ellipse">Elipse</string>
+
+    <!-- Draw Attributes -->
+
+    <string name="stroke_width">Anchura del trazo: %d</string>
+    <string name="opacity">Opacidad: %d</string>
+    <string name="font_size">Tamaño del texto: %d</string>
+
+</resources>
