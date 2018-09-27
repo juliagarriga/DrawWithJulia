@@ -1,5 +1,9 @@
 package com.byox.drawview.dictionaries;
 
+import android.graphics.Color;
+import android.support.annotation.ColorInt;
+
+import com.byox.drawview.utils.SerializablePaint;
 import com.byox.drawview.utils.SerializablePath;
 
 import java.io.Serializable;
@@ -13,12 +17,14 @@ import java.util.List;
 public class Move implements Serializable {
 
     private SerializablePath path;
+    private SerializablePaint paint;
     private float startX, startY, endX, endY;
     private List<Float> pointsX, pointsY;
 
-    public Move() {
+    public Move(SerializablePaint paint) {
         pointsX = new ArrayList<>();
         pointsY = new ArrayList<>();
+        this.paint = paint;
     }
 
     public SerializablePath getPath() {
@@ -27,6 +33,15 @@ public class Move implements Serializable {
 
     public void setPath(SerializablePath path) {
         this.path = path;
+    }
+
+    public SerializablePaint getPaint() {
+        int color = paint.getColor();
+        return paint;
+    }
+
+    public void setPaint(SerializablePaint paint) {
+        this.paint = paint;
     }
 
     public float getStartX() {

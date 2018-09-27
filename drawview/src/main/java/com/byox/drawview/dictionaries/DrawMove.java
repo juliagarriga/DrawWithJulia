@@ -32,7 +32,6 @@ import java.util.List;
 
 public class DrawMove implements Serializable {
 
-    private SerializablePaint mPaint;
     private int originalColor;
     private DrawingMode mDrawingMode = null;
     private DrawingTool mDrawingTool = null;
@@ -44,6 +43,7 @@ public class DrawMove implements Serializable {
     private byte[] mBackgroundImage;
     private List<DrawMove> movedMoves;     // only for DrawingMode MOVE
     private float tempX, tempY;
+    private SerializablePaint mPaint;
 
     // METHODS
     public DrawMove() {
@@ -58,11 +58,11 @@ public class DrawMove implements Serializable {
     // GETTERS
 
     public SerializablePaint getPaint() {
-        return mPaint;
+        return mDrawingMovesList.get(mDrawingMovesListIndex).getPaint();
     }
 
     public void resetColor() {
-        mPaint.setColor(originalColor);
+        mDrawingMovesList.get(mDrawingMovesListIndex).getPaint().setColor(originalColor);
     }
 
     public DrawingMode getDrawingMode() {
@@ -110,6 +110,13 @@ public class DrawMove implements Serializable {
     public void setPaint(SerializablePaint paint) {
         mPaint = paint;
         originalColor = paint.getColor();
+        mDrawingMovesList.get(mDrawingMovesListIndex).setPaint(paint);
+    }
+
+    public void setTransparentMove() {
+        SerializablePaint paint = new SerializablePaint();
+        paint.setColor(Color.TRANSPARENT);
+        mDrawingMovesList.get(mDrawingMovesListIndex).setPaint(paint);
     }
 
     public void setDrawingMode(DrawingMode drawingMode) {
@@ -168,7 +175,7 @@ public class DrawMove implements Serializable {
                 mDrawingMovesListIndex < mDrawingMovesList.size() - 1)
             mDrawingMovesList = mDrawingMovesList.subList(0, mDrawingMovesListIndex + 1);
 
-        Move move = new Move();
+        Move move = new Move(mPaint);
 
         mDrawingMovesList.add(move);
 
@@ -204,6 +211,7 @@ public class DrawMove implements Serializable {
     }
 
     public void undo() {
+
         mDrawingMovesListIndex--;
     }
 

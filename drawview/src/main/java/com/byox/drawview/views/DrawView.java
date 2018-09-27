@@ -1589,7 +1589,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
 
         for (int i = 0; i < mDrawMoveHistoryIndex; i++) {
             DrawMove drawMove = mDrawMoveHistory.get(i);
-            if (drawMove.getDrawingMode() != null) {
+            if (drawMove.getDrawingMode() != null && drawMove.getPaint().getColor() != Color.TRANSPARENT) {
 
                 float x = move.getStartX();
                 float y = move.getStartY();
@@ -1681,7 +1681,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                                 break;
                             case RECTANGLE:
 
-                                if (checkInRectangle(x, y, drawMove.getStartX(), drawMove.getStartY(), drawMove.getEndX(), drawMove.getEndY())) {
+                                if (checkInRectangle(Epsilon, x, y, drawMove.getStartX(), drawMove.getStartY(), drawMove.getEndX(), drawMove.getEndY())) {
 
                                     addMove(drawMove, vx, vy);
 
@@ -1698,7 +1698,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                                 float endX = startX + 2*radius;
                                 float endY = startY + 2*radius;
 
-                                if (checkInRectangle(x, y, startX, startY, endX, endY)) {
+                                if (checkInRectangle(Epsilon, x, y, startX, startY, endX, endY)) {
 
                                     addMove(drawMove, vx, vy);
 
@@ -1714,7 +1714,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                                 endX = drawMove.getEndX() + abs(drawMove.getEndX() - drawMove.getStartX());
                                 endY = drawMove.getEndY() + abs(drawMove.getEndY() - drawMove.getStartY());
 
-                                if (checkInRectangle(x, y, startX, startY, endX, endY)) {
+                                if (checkInRectangle(Epsilon, x, y, startX, startY, endX, endY)) {
 
                                     addMove(drawMove, vx, vy);
 
@@ -1739,7 +1739,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                         float endX = startX + rect.width();
                         float endY = startY + rect.height();
 
-                        if (checkInRectangle(x, y, startX, startY, endX, endY)) {
+                        if (checkInRectangle(Epsilon, x, y, startX, startY, endX, endY)) {
 
                             addMove(drawMove, vx, vy);
 
@@ -1835,7 +1835,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                 }
 
 
-                if (checkInRectangle(move.getEndX(), move.getEndY(), deleteL, deleteB, deleteR, deleteT))
+                if (checkInRectangle(20, move.getEndX(), move.getEndY(), deleteL, deleteB, deleteR, deleteT))
                     onDrawViewListener.onDeleteDrawing(true);
                 else
                     onDrawViewListener.onDeleteDrawing(false);
@@ -1844,8 +1844,8 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                 if (lastMove) {
                     drawMove.resetColor();
 
-                    if (checkInRectangle(move.getEndX(), move.getEndY(), deleteL, deleteB, deleteR, deleteT)) {
-                        addMove(drawMove, -drawMove.getStartX(), -drawMove.getStartY());
+                    if (checkInRectangle(20, move.getEndX(), move.getEndY(), deleteL, deleteB, deleteR, deleteT)) {
+                        drawMove.setTransparentMove();
                     }
                 }
             }
@@ -1855,7 +1855,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
 
     // PRIVATE METHODS
 
-    private boolean checkInRectangle(float x, float y, float startX, float startY, float endX, float endY) {
+    private boolean checkInRectangle(int Epsilon, float x, float y, float startX, float startY, float endX, float endY) {
         if (abs(x - startX) < Epsilon)
             if (y >= (startY - Epsilon)  && y <= (endY + Epsilon))
                 return true;
