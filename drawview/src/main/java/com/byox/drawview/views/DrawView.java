@@ -307,7 +307,7 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
 
                                     // Lets calculate the size of the text
                                     Rect textBounds = new Rect();
-                                    SerializablePaint paint = getPaintParameters();
+                                    SerializablePaint paint = getPaintParameters(drawMove);
                                     paint.setStyle(Paint.Style.FILL);
                                     paint.setStrokeWidth(0);
                                     paint.getTextBounds(drawMove.getText(), 0,
@@ -926,23 +926,39 @@ public class DrawView extends FrameLayout implements View.OnTouchListener {
                     mDrawMoveHistory.get(mDrawMoveHistoryIndex).getPaint().getTypeface());
             currentPaint.setTextSize(mFontSize);
         } else {
-            currentPaint = getPaintParameters();
+            currentPaint = getPaintParameters(null);
         }
         return currentPaint;
     }
 
-    public SerializablePaint getPaintParameters() {
+    public SerializablePaint getPaintParameters(DrawMove drawMove) {
 
         SerializablePaint paint = new SerializablePaint();
-        paint.setColor(mDrawColor);
-        paint.setStyle(mPaintStyle);
-        paint.setDither(mDither);
-        paint.setStrokeWidth(mDrawWidth);
-        paint.setAlpha(mDrawAlpha);
-        paint.setAntiAlias(mAntiAlias);
-        paint.setStrokeCap(mLineCap);
-        paint.setTypeface(mFontFamily);
-        paint.setTextSize(mFontSize);
+
+        if (drawMove != null) {
+
+            paint.setColor(drawMove.getPaint().getColor());
+            paint.setStyle(drawMove.getPaint().getStyle());
+            paint.setDither(drawMove.getPaint().isDither());
+            paint.setStrokeWidth(drawMove.getPaint().getStrokeWidth());
+            paint.setAlpha(drawMove.getPaint().getAlpha());
+            paint.setAntiAlias(drawMove.getPaint().isAntiAlias());
+            paint.setStrokeCap(drawMove.getPaint().getStrokeCap());
+            paint.setTypeface(drawMove.getPaint().getTypeface());
+            paint.setTextSize(drawMove.getPaint().getTextSize());
+
+        } else {
+            paint.setColor(mDrawColor);
+            paint.setStyle(mPaintStyle);
+            paint.setDither(mDither);
+            paint.setStrokeWidth(mDrawWidth);
+            paint.setAlpha(mDrawAlpha);
+            paint.setAntiAlias(mAntiAlias);
+            paint.setStrokeCap(mLineCap);
+            paint.setTypeface(mFontFamily);
+            paint.setTextSize(mFontSize);
+
+        }
 
         return paint;
     }
